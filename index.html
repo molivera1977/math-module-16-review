@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Math Module 16 Review: Multiplying Fractions</title>
+  <style>
+    :root {
+      --primary: #d35400;
+      --primary-dark: #922b21;
+      --secondary: #f39c12;
+      --card-bg: #ffffff;
+      --text: #333;
+      --teal: #1abc9c;
+      --teal-dark: #148f77;
+      --locked-bg: #e9ecef;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      background: linear-gradient(135deg, #d35400 0%, #f39c12 100%);
+      color: var(--text); margin: 0; padding: 0; line-height: 1.6; min-height: 100vh;
+    }
+    .container {
+      max-width: 800px; margin: 2rem auto; background: var(--card-bg);
+      padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      min-height: 50vh; position: relative; z-index: 10;
+    }
+    h1 { text-align: center; color: var(--primary); letter-spacing: 1px; margin-top: 0; }
+
+    /* FRACTIONS */
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; font-size: 0.88em; line-height: 1.15; }
+    .frac-top { display: block; border-bottom: 2px solid currentColor; padding: 0 4px; text-align: center; min-width: 1em; }
+    .frac-bottom { display: block; padding: 0 4px; text-align: center; min-width: 1em; }
+    .mixed-num { display: inline-flex; align-items: center; vertical-align: middle; gap: 3px; }
+
+    /* BADGE ROW */
+    .q-badge { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .q-badge-pill { background: var(--primary); color: white; border-radius: 50px; padding: 6px 18px; font-size: 1rem; font-weight: bold; }
+    .score-badge { background: #f39c12; color: #5a3000; border-radius: 50px; padding: 6px 18px; font-size: 1rem; font-weight: bold; }
+
+    /* STREAK */
+    .streak-bar { text-align: center; font-size: 1.4rem; min-height: 34px; margin-bottom: 6px; transition: all 0.3s; }
+
+    /* READING TIMER (12s unlock) */
+    .reading-timer-bar {
+      background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px;
+      padding: 8px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px;
+      font-size: 0.95rem; font-weight: bold; color: #856404;
+    }
+    .reading-timer-fill-wrap { flex: 1; height: 8px; background: #ffe69c; border-radius: 4px; overflow: hidden; }
+    .reading-timer-fill { height: 100%; background: #d35400; width: 0%; transition: width 0.1s linear; border-radius: 4px; }
+    .reading-timer-count { min-width: 28px; text-align: right; font-size: 1rem; }
+
+    /* NEXT TIMER (10s soak) */
+    .next-timer-bar {
+      background: #d1ecf1; border: 2px solid #17a2b8; border-radius: 10px;
+      padding: 8px 16px; margin-top: 10px; display: flex; align-items: center; gap: 12px;
+      font-size: 0.95rem; font-weight: bold; color: #0c5460;
+    }
+    .next-timer-fill-wrap { flex: 1; height: 8px; background: #bee5eb; border-radius: 4px; overflow: hidden; }
+    .next-timer-fill { height: 100%; background: #17a2b8; width: 100%; transition: width 0.1s linear; border-radius: 4px; }
+
+    /* PROGRESS */
+    .progress-bar { height: 12px; background: #e9ecef; border-radius: 6px; margin-bottom: 10px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #d35400, #f39c12); width: 0%; transition: width 0.4s ease; }
+
+    /* TIMER */
+    .timer-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+    .timer-display { background: #2c3e50; color: #2ecc71; border-radius: 10px; padding: 6px 18px; font-size: 1.2rem; font-family: monospace; font-weight: bold; letter-spacing: 2px; min-width: 80px; text-align: center; }
+    .timer-display.warning { color: #e74c3c; }
+
+    /* QUESTION */
+    h2 { font-size: 1.4rem; margin-bottom: 1.2rem; color: #2c3e50; line-height: 2.2rem; }
+    .question-header { display: flex; align-items: flex-start; gap: 10px; }
+    .options-grid { display: grid; gap: 12px; }
+
+    button.answer-btn {
+      background: white; color: var(--primary); border: 3px solid #e0e0e0; padding: 14px 16px;
+      border-radius: 15px; font-size: 1.15rem; font-family: "Comic Sans MS", cursive;
+      cursor: pointer; text-align: left; width: 100%; display: flex;
+      justify-content: space-between; align-items: center; transition: all 0.2s;
+      box-shadow: 0 4px 0 #e0e0e0; white-space: normal; word-wrap: break-word; min-height: 58px;
+    }
+    button.answer-btn:hover:not(:disabled) { background: #fef5e7; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 0 #f0a500; }
+    button.answer-btn.selected  { background: #d5f5e3; border-color: var(--teal); border-width: 3px; font-weight: bold; box-shadow: 0 4px 0 var(--teal-dark); }
+    button.answer-btn:disabled  { cursor: not-allowed; opacity: 0.75; }
+    button.answer-btn.locked-choice { background: var(--locked-bg); color: #999; cursor: not-allowed; border-color: #ccc; }
+    button.correct   { background-color: #d4edda; border-color: #28a745; color: #155724; box-shadow: 0 4px 0 #28a745; }
+    button.incorrect { background-color: #f8d7da; border-color: #dc3545; color: #721c24; box-shadow: 0 4px 0 #dc3545; }
+
+    .controls { margin-top: 22px; display: flex; justify-content: flex-end; gap: 10px; }
+    button.action-btn {
+      background: var(--primary); color: white; border: none; padding: 14px 28px;
+      border-radius: 12px; font-size: 1.15rem; cursor: pointer; font-family: "Comic Sans MS", cursive;
+      box-shadow: 0 4px 0 var(--primary-dark); transition: transform 0.1s;
+    }
+    button.action-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 0 var(--primary-dark); }
+    button.action-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--primary-dark); }
+    button.action-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: none; }
+
+    /* CONFIRM / THAT'S MY ANSWER */
+    #confirm-btn {
+      background: var(--teal); box-shadow: 0 4px 0 var(--teal-dark);
+    }
+    #confirm-btn:hover:not(:disabled) { box-shadow: 0 6px 0 var(--teal-dark); }
+
+    /* START / LOGIN */
+    .login-box { max-width: 420px; margin: 0 auto 24px; }
+    .login-box label { font-size: 1.05rem; font-weight: bold; color: #555; display: block; margin-bottom: 6px; }
+    .login-box select, .login-box input {
+      width: 100%; padding: 11px 14px; border-radius: 10px; border: 2px solid #ccc;
+      font-size: 1.05rem; font-family: "Comic Sans MS", cursive; margin-bottom: 14px;
+    }
+    .login-box select:focus, .login-box input:focus { outline: none; border-color: var(--primary); }
+    .login-error { color: #c0392b; font-size: 0.95rem; font-weight: bold; text-align: center; min-height: 22px; margin-bottom: 6px; }
+    .sign-in-btn {
+      width: 100%; padding: 13px; margin-top: 6px; border: none; border-radius: 12px;
+      background: var(--teal); color: white; font-size: 1.1rem;
+      font-family: "Comic Sans MS", cursive; cursor: pointer;
+      box-shadow: 0 4px 0 var(--teal-dark); transition: transform 0.1s;
+    }
+    .sign-in-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--teal-dark); }
+    .start-grid { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .start-btn { background: var(--primary); color: white; padding: 20px 40px; border: none; border-radius: 15px; cursor: pointer; font-size: 1.3rem; font-family: "Comic Sans MS", cursive; box-shadow: 0 5px 0 var(--primary-dark); transition: transform 0.1s; }
+    .start-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 0 var(--primary-dark); }
+    .score-btn { background: var(--secondary); color: #5a3000; padding: 14px 28px; border: none; border-radius: 15px; cursor: pointer; font-size: 1.15rem; font-family: "Comic Sans MS", cursive; box-shadow: 0 5px 0 #c49f0a; transition: transform 0.1s; margin-top: 10px; }
+    .score-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #c49f0a; }
+
+    /* RESUME */
+    #resume-container { margin-bottom: 20px; text-align: center; }
+    .resume-btn { background: #e67e22; color: white; padding: 14px 28px; border: none; border-radius: 15px; cursor: pointer; font-size: 1.15rem; font-family: "Comic Sans MS", cursive; box-shadow: 0 5px 0 #a85813; transition: transform 0.1s; }
+    .resume-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #a85813; }
+
+    /* FEEDBACK */
+    .feedback-box { margin-top: 18px; padding: 18px; border-radius: 12px; display: none; font-size: 1.05rem; border: 2px solid transparent; }
+
+    /* SPEAK */
+    .speak-btn { background: none; border: 2px solid #ccc; border-radius: 50%; cursor: pointer; font-size: 1.3rem; padding: 7px 11px; min-width: 43px; flex-shrink: 0; }
+    .speak-btn-mini { font-size: 1.1rem; cursor: pointer; padding-left: 10px; z-index: 5; }
+
+    /* HIGHLIGHT */
+    .wrd { display: inline; }
+    .wrd.hl { background: #ffe01b; border-radius: 3px; padding: 0 2px; }
+
+    /* END SCREEN */
+    #end-screen { text-align: center; }
+    #final-percent { font-size: 5rem; font-weight: bold; color: var(--primary); display: block; opacity: 0; transform: scale(0.5); transition: opacity 0.6s ease, transform 0.6s ease; margin: 10px 0; }
+    #final-percent.revealed { opacity: 1; transform: scale(1); }
+    .missed-list { text-align: left; background: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; padding: 16px 20px; margin: 16px 0; max-height: 240px; overflow-y: auto; }
+    .missed-list h3 { margin: 0 0 10px; color: #856404; font-size: 1rem; }
+    .missed-item { background: white; border-left: 4px solid #dc3545; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; font-size: 0.9rem; line-height: 1.6; }
+    .missed-item .mi-label { color: #dc3545; font-weight: bold; font-size: 0.8rem; }
+    .end-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+
+    /* SCOREBOARD */
+    .scoreboard-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
+    .scoreboard-table th, .scoreboard-table td { border-bottom: 2px solid #eee; padding: 9px 10px; text-align: center; }
+    .scoreboard-table th { color: var(--primary); }
+    .score-good { color: #27ae60; font-weight: bold; }
+    .score-ok { color: #f39c12; font-weight: bold; }
+    .score-bad { color: #c0392b; font-weight: bold; }
+
+    #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99; }
+    .hidden { display: none !important; }
+
+    /* LOCKED COMPLETED FORM BUTTONS */
+    .start-btn.form-btn-locked { background: #7f8c8d !important; box-shadow: 0 5px 0 #566573 !important; }
+    .start-btn.form-btn-locked:hover { background: #95a5a6 !important; box-shadow: 0 8px 0 #7f8c8d !important; }
+    .form-btn-sub { font-size: 0.65em; display: block; font-weight: normal; opacity: 0.9; margin-top: 3px; }
+
+    /* GLOBAL PIN MODAL */
+    #pin-modal { display: flex; align-items: center; justify-content: center;
+                 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                 background: rgba(0,0,0,0.55); z-index: 500; }
+
+    @media(max-width:600px) {
+      .container { margin: 10px; padding: 1.5rem; }
+      h1 { font-size: 1.35rem; }
+      button.answer-btn { font-size: 1rem; padding: 12px; }
+      #final-percent { font-size: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+
+<div class="container">
+  <h1>✖️ Math Module 16 Review</h1>
+
+  <!-- START SCREEN -->
+  <div id="start-screen">
+
+    <!-- RESUME CARD -->
+    <div id="resume-container" class="hidden">
+      <p style="margin-bottom:8px;font-weight:bold;color:#555;">Welcome back! You have an unfinished test.</p>
+      <button class="resume-btn" onclick="app.resumeTest()">↩️ Resume My Test</button>
+      <div style="margin-top:10px;">
+        <button onclick="app.discardProgress()"
+          style="background:none;border:none;color:#c0392b;font-size:0.88rem;cursor:pointer;
+                 font-family:'Comic Sans MS',cursive;text-decoration:underline;padding:4px;">
+          🗑️ Discard progress &amp; start over (Teacher PIN required)
+        </button>
+      </div>
+      <hr style="margin:18px 0;opacity:0.3;">
+    </div>
+
+    <!-- STUDENT LOGIN -->
+    <div id="student-login-panel">
+      <div class="login-box">
+
+        <!-- STEP 1: Name dropdown -->
+        <label for="name-select">👤 Select your name:</label>
+        <select id="name-select" onchange="app.onNameSelect()">
+          <option value="">-- Choose your name --</option>
+        </select>
+
+        <!-- STEP 2: PIN — hidden until name chosen -->
+        <div id="pin-section" class="hidden">
+          <label for="student-pin" id="pin-label">🔒 Enter your student number:</label>
+          <input type="password" id="student-pin" placeholder="Student number..."
+                 onkeydown="if(event.key==='Enter') app.attemptLogin()" autocomplete="off" />
+          <!-- Guest name field — only shown for guest slots -->
+          <div id="guest-name-section" class="hidden">
+            <label for="guest-display-name">✏️ Enter your first name:</label>
+            <input type="text" id="guest-display-name" placeholder="e.g. Henry" maxlength="20"
+                   onkeydown="if(event.key==='Enter') app.attemptLogin()" />
+          </div>
+          <button class="sign-in-btn" onclick="app.attemptLogin()">✅ Sign In</button>
+        </div>
+
+        <div class="login-error" id="login-error"></div>
+      </div>
+
+      <p style="text-align:center;font-size:1.15rem;margin:20px 0 14px;">Select a review form:</p>
+      <div class="start-grid">
+        <button class="start-btn" id="form-a-btn" onclick="app.attemptLogin('A')" disabled style="opacity:0.4;">📝 Form A</button>
+        <button class="start-btn" id="form-b-btn" onclick="app.attemptLogin('B')" disabled style="opacity:0.4;">📝 Form B</button>
+        <button class="start-btn" id="form-c-btn" onclick="app.attemptLogin('C')" disabled style="opacity:0.4;">📝 Form C</button>
+      </div>
+      <div id="scores-btn-wrap" class="hidden" style="text-align:center;">
+        <button class="score-btn" onclick="app.showScores()">📊 View Score History</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen" class="hidden">
+    <div class="q-badge">
+      <span class="q-badge-pill" id="progress-text">Question 1 of 14</span>
+      <span class="score-badge" id="score-text">Score: 0</span>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="streak-bar" id="streak-bar"></div>
+
+    <div class="timer-row">
+      <div class="timer-display" id="timer-display">00:00</div>
+    </div>
+
+    <!-- 15s reading unlock bar -->
+    <div class="reading-timer-bar" id="reading-timer-bar">
+      <span>📖 Read carefully — answers unlock in</span>
+      <div class="reading-timer-fill-wrap"><div class="reading-timer-fill" id="reading-fill"></div></div>
+      <span class="reading-timer-count" id="reading-count">12</span><span>s</span>
+    </div>
+
+    <div class="question-header">
+      <button class="speak-btn" id="speak-q-btn" onclick="app.speakQuestion()" title="Read question aloud">🔊</button>
+      <h2 id="question-text"></h2>
+    </div>
+
+    <div class="options-grid" id="answers" role="radiogroup" aria-label="Answer choices"></div>
+
+    <!-- 8s next soak bar (hidden until answer confirmed) -->
+    <div class="next-timer-bar hidden" id="next-timer-bar">
+      <span>⏳ Next in</span>
+      <div class="next-timer-fill-wrap"><div class="next-timer-fill" id="next-fill"></div></div>
+      <span class="reading-timer-count" id="next-count">8</span><span>s</span>
+    </div>
+
+    <div id="feedback" class="feedback-box"></div>
+
+    <div class="controls">
+      <button id="confirm-btn" class="action-btn hidden" onclick="app.confirmAnswer()">✅ That's My Answer!</button>
+      <button id="next-btn"    class="action-btn hidden" onclick="app.nextQuestion()">Next ➡️</button>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="end-screen" class="hidden">
+    <h2 style="text-align:center;">🎉 Review Complete!</h2>
+    <p id="final-score-sub" style="text-align:center;color:#666;margin-bottom:0;"></p>
+    <span id="final-percent"></span>
+    <p id="final-msg" style="font-size:1.3rem;text-align:center;"></p>
+    <div id="missed-section" class="missed-list hidden">
+      <h3>📋 Questions to Review:</h3>
+      <div id="missed-items"></div>
+    </div>
+    <div class="end-btns">
+      <button class="start-btn" onclick="app.tryAgain()">🔄 Try Again</button>
+      <button class="start-btn" style="background:#27ae60;box-shadow:0 5px 0 #1e8449;" onclick="app.restart()">🏠 Home</button>
+    </div>
+  </div>
+
+  <!-- GLOBAL PIN MODAL — used for: discard progress, unlock completed form, try-again gate -->
+  <div id="pin-modal" class="hidden">
+    <div style="background:white;border-radius:20px;padding:2rem 2rem 1.5rem;max-width:380px;
+                width:90%;box-shadow:0 10px 30px rgba(0,0,0,0.4);font-family:'Comic Sans MS',cursive;
+                position:relative;z-index:501;">
+      <h3 id="pin-modal-title" style="color:var(--primary);margin:0 0 10px;text-align:center;"></h3>
+      <p  id="pin-modal-msg"   style="text-align:center;color:#555;margin-bottom:14px;font-size:0.95rem;line-height:1.5;"></p>
+      <input type="password" id="pin-modal-input" placeholder="Teacher PIN…" maxlength="10" autocomplete="off"
+             onkeydown="if(event.key==='Enter') app.confirmPinModal()"
+             style="width:100%;padding:11px 14px;border-radius:10px;border:2px solid #ccc;
+                    font-size:1.05rem;font-family:'Comic Sans MS',cursive;margin-bottom:8px;" />
+      <div id="pin-modal-error"
+           style="color:#c0392b;font-weight:bold;min-height:20px;margin-bottom:10px;
+                  font-size:0.9rem;text-align:center;"></div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="action-btn"
+                style="background:#27ae60;box-shadow:0 4px 0 #1e8449;"
+                onclick="app.confirmPinModal()">✅ Confirm</button>
+        <button class="action-btn"
+                style="background:#7f8c8d;box-shadow:0 4px 0 #566573;"
+                onclick="app.cancelPinModal()">✕ Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCOREBOARD SCREEN -->
+  <div id="scoreboard-screen" class="hidden">
+    <h2 style="color:var(--primary);text-align:center;">📊 Score History</h2>
+    <p id="no-scores-msg" style="text-align:center;color:#999;display:none;">No scores yet — take the review to record your first score!</p>
+    <div id="score-list"></div>
+    <!-- Inline PIN panel — replaces native prompt/confirm for clearing history -->
+    <div id="clear-confirm-panel" class="hidden" style="background:#fff3cd;border:2px solid #ffc107;border-radius:12px;padding:16px 20px;margin:14px 0;text-align:left;">
+      <p style="margin:0 0 10px;font-weight:bold;color:#856404;">🔒 Enter Teacher PIN to delete all score history:</p>
+      <input type="password" id="clear-pin-input" placeholder="Teacher PIN…" maxlength="10" autocomplete="off"
+             onkeydown="if(event.key==='Enter') app.confirmClearScores()"
+             style="width:100%;padding:10px 14px;border-radius:10px;border:2px solid #ccc;font-size:1.05rem;font-family:'Comic Sans MS',cursive;margin-bottom:8px;" />
+      <div id="clear-pin-error" style="color:#c0392b;font-weight:bold;min-height:20px;margin-bottom:8px;font-size:0.9rem;"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="score-btn" style="background:#e74c3c;color:white;box-shadow:0 5px 0 #922b21;" onclick="app.confirmClearScores()">🗑️ Yes, Delete All</button>
+        <button class="score-btn" onclick="app.cancelClearScores()">✕ Cancel</button>
+      </div>
+    </div>
+
+    <div class="end-btns" style="margin-top:20px;">
+      <button class="score-btn" onclick="app.printResults()">🖨️ Print Report</button>
+      <button class="score-btn" style="background:#e74c3c;color:white;box-shadow:0 5px 0 #922b21;" onclick="app.clearScores()">🗑️ Clear History</button>
+      <button class="score-btn" onclick="app.closeScores()">← Back</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── FRACTION HELPERS ── */
+function frac(n,d){ return `<span class="fraction"><span class="frac-top">${n}</span><span class="frac-bottom">${d}</span></span>`; }
+function mixed(w,n,d){ return `<span class="mixed-num">${w}<span class="fraction"><span class="frac-top">${n}</span><span class="frac-bottom">${d}</span></span></span>`; }
+
+/* ── TEXT FORMATTER ── */
+function formatMathText(raw){
+  if(!raw) return '';
+  // Step 1: protect the × symbol from being re-processed
+  let s = raw;
+  // Step 2: convert mixed numbers like "2 1/5" → vertical mixed
+  s = s.replace(/(\d+)\s+(\d+)\/(\d+)/g,(_,w,n,d)=>mixed(w,n,d));
+  // Step 3: remaining simple fractions
+  s = s.replace(/(\d+)\/(\d+)/g,(_,n,d)=>frac(n,d));
+  // Step 4: bare 'x' as multiplication symbol (word boundary only)
+  s = s.replace(/\bx\b/g,'×');
+  return s;
+}
+
+/* ── SPOKEN TEXT CONVERTER ── */
+const ORDINALS = {
+  '2':'halves','3':'thirds','4':'fourths','5':'fifths','6':'sixths',
+  '7':'sevenths','8':'eighths','9':'ninths','10':'tenths',
+  '12':'twelfths','16':'sixteenths','100':'hundredths'
+};
+function denomToWord(d){
+  return ORDINALS[d] || `over ${d}`;
+}
+function numToWord(n){
+  const words = ['zero','one','two','three','four','five','six','seven','eight',
+                 'nine','ten','eleven','twelve','thirteen','fourteen','fifteen',
+                 'sixteen','seventeen','eighteen','nineteen','twenty'];
+  return words[parseInt(n)] !== undefined ? words[parseInt(n)] : n;
+}
+// Singular forms of denominator words — used when the numerator is 1
+// e.g. "one half" not "one halves"
+const SINGULAR_DENOM = {
+  'halves':'half','thirds':'third','fourths':'fourth','fifths':'fifth',
+  'sixths':'sixth','sevenths':'seventh','eighths':'eighth','ninths':'ninth',
+  'tenths':'tenth','twelfths':'twelfth','sixteenths':'sixteenth','hundredths':'hundredth'
+};
+
+function convertToSpokenText(raw){
+  return raw
+    // Mixed numbers: "2 1/5" → "2 and one fifth"
+    .replace(/(\d+)\s+(\d+)\/(\d+)/g, (_,w,n,d) => {
+      const dWord  = denomToWord(d);
+      const nNum   = parseInt(n);
+      const dFinal = nNum === 1 ? (SINGULAR_DENOM[dWord] || dWord) : dWord;
+      return `${w} and ${numToWord(n)} ${dFinal}`;
+    })
+    // Simple fractions: "1/2" → "one half", "2/5" → "two fifths"
+    .replace(/(\d+)\/(\d+)/g, (_,n,d) => {
+      const dWord  = denomToWord(d);
+      const nNum   = parseInt(n);
+      const dFinal = nNum === 1 ? (SINGULAR_DENOM[dWord] || dWord) : dWord;
+      return `${numToWord(n)} ${dFinal}`;
+    })
+    .replace(/×/g,' times ')
+    .replace(/\bx\b/g,' times ');
+}
+
+/* ── FIRST NAME HELPER ── */
+// Extracts a friendly first name from roster / guest formats:
+//   "Giraldo, Layla"       → "Layla"
+//   "Guest 1 - Henry"      → "Henry"
+//   "Mr. O (Teacher)"      → "Mr. O"
+function getFirstName(n){
+  if(!n) return '';
+  if(n.includes(' - ')) return n.split(' - ').pop().trim();          // guest slot
+  if(n.includes(','))   return n.split(',')[1].trim().split(' ')[0]; // roster: Last, First
+  return n.split(' ')[0];                                            // fallback
+}
+
+/* ══════════════════════════════════════════
+   DASHBOARD REPORTING
+══════════════════════════════════════════ */
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzv8CWv1yyi8NeH04now9UxVL4IZm5yMqqsEGMcgGdrcAOWVB-aSp5siTvSSJXIUpzFMA/exec';
+
+// Tab switch detection
+let tabSwitchCount = 0;
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden && app.currentIndex > 0) tabSwitchCount++;
+});
+
+// Session ID — unique per sitting
+const SESSION_ID = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+function buildSubmission(done){
+  // Use timerSeconds (actual quiz time, pauses when tab is hidden)
+  // rather than wall-clock time since page load
+  const elapsed = app.timerSeconds;
+  // Send ID + full question text so the Sheet is human-readable without a key
+  const wrongQs = app.missedQuestions.map(m => `[${m.id}] ${m.q}`).join(' | ');
+  const pct = app.currentTest.length > 0
+    ? Math.round((app.score / app.currentTest.length) * 100) : 0;
+  return {
+    action:        'submit',
+    game:          'mod16review',
+    sessionId:     SESSION_ID,
+    name:          app.studentName || 'Unknown',
+    form:          `Form ${app.currentForm || '?'}`,
+    score:         app.score,
+    total:         app.currentTest.length,
+    percent:       pct,
+    status:        done ? 'Complete' : `In Progress (Q${app.currentIndex + 1}/${app.currentTest.length})`,
+    done,
+    elapsed,
+    tabSwitches:   tabSwitchCount,
+    wrongQuestions: wrongQs,
+    timestamp:     new Date().toLocaleString('en-US',{timeZone:'America/New_York'})
+  };
+}
+
+function submitScorePartial(){
+  fetch(SHEET_URL, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(buildSubmission(false))
+  }).catch(()=>{});
+}
+
+function submitScoreFinal(){
+  fetch(SHEET_URL, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(buildSubmission(true))
+  }).catch(()=>{});
+}
+
+/* ══════════════════════════════════════════
+   ROSTER & GUEST SLOTS
+══════════════════════════════════════════ */
+const ROSTER = [
+  { name: 'Mr. O (Teacher)',           id: '9377'     },
+  { name: 'Aquino-Perez, Steven',      id: '10048814' },
+  { name: 'Camas-Alvarez, Mike',       id: '10060436' },
+  { name: 'Earle, Jeremiah',           id: '10038362' },
+  { name: 'Felix, Chloe',              id: '10065242' },
+  { name: 'Flores Marcos, Cornelio',   id: '10037877' },
+  { name: "Gardner, Zy'iere",          id: '10057389' },
+  { name: 'Giraldo, Layla',            id: '10053382' },
+  { name: 'Lawrence, Lennox',          id: '10045050' },
+  { name: 'Michael, Mulan',            id: '10051762' },
+  { name: 'Millet, Zion',              id: '10053340' },
+  { name: 'Murillo Estrada, Kevin',    id: '10065967' },
+  { name: 'Romaniello, Kaylib',        id: '10041081' },
+  { name: 'Sanango-Quizhpi, Anthony',  id: '10065990' },
+  { name: 'Santos-Bautista, Scarlet',  id: '10062436' },
+  { name: 'Simpson, Jordyn',           id: '10045306' },
+  { name: 'Torres, Aryana',            id: '10053178' },
+  { name: 'Towns, Micah',              id: '10043892' },
+  { name: 'Ulerio-Jimenez, Adrian',    id: '10061117' }
+];
+
+const GUEST_SLOTS = {
+  '937701': 'Guest 1',
+  '937702': 'Guest 2',
+  '937703': 'Guest 3',
+  '937704': 'Guest 4',
+  '937705': 'Guest 5'
+};
+
+/* Build name dropdown — students first, then a divider, then guest slots */
+(function buildRoster(){
+  const sel = document.getElementById('name-select');
+
+  // Regular students
+  ROSTER.forEach(s=>{
+    const opt = document.createElement('option');
+    opt.value = s.name;
+    opt.textContent = s.name;
+    sel.appendChild(opt);
+  });
+
+  // Divider
+  const div = document.createElement('option');
+  div.disabled = true;
+  div.textContent = '── Guest Slots ──';
+  sel.appendChild(div);
+
+  // Guest slots
+  Object.entries(GUEST_SLOTS).forEach(([code, label])=>{
+    const opt = document.createElement('option');
+    opt.value = `GUEST:${code}`;          // prefix so we can detect guest selection
+    opt.textContent = `🙋 ${label}`;
+    sel.appendChild(opt);
+  });
+})();
+
+let loggedInName = '';
+let unlockedForms = new Set();   // forms the teacher has PIN-unlocked for retry this session
+let pinModalCallback = null;     // action to execute when the PIN modal is confirmed
+
+
+
+/* ═══════════════════════════════════════════
+   MODULE 16 QUESTION BANKS — Forms A & B
+   Topic: Multiplying Fractions & Mixed Numbers
+   Pre-audited: all products verified
+═══════════════════════════════════════════ */
+const tests = {
+  A: [
+    { id:"A01", q:"Which of these is the product of 5 × 2/5?",
+      options:["2/25","2/10","10/25","10/5"],
+      answer:"10/5",
+      explanation:"Multiply the numerator by the whole number: 5 × 2 = 10. Keep the denominator: 10/5." },
+
+    { id:"A02", q:"Which of these is the product of 3 × 1/8?",
+      options:["1/24","3/8","8/3","25/8"],
+      answer:"3/8",
+      explanation:"Multiply 3 × 1 = 3. Keep the denominator: 3/8." },
+
+    { id:"A03", q:"Aidan spent 1/2 hour each day practicing basketball. He practiced 5 days this week. How many hours did Aidan practice this week?",
+      options:["2/5 hour","5/10 hour","5/2 hours","11/2 hours"],
+      answer:"5/2 hours",
+      explanation:"5 × 1/2: multiply 5 × 1 = 5. Keep denominator: 5/2 hours." },
+
+    { id:"A04", q:"A business plants trees on 2/4 acre of land each month for 7 months. How many acres of land does the business plant with trees after 7 months?",
+      options:["2/28 acre","14/28 acre","14/4 acres","30/4 acres"],
+      answer:"14/4 acres",
+      explanation:"7 × 2/4: multiply 7 × 2 = 14. Keep denominator: 14/4 acres." },
+
+    { id:"A05", q:"Stefanie has 6 strands of yarn. She colors 1/2 foot of each strand yellow. How many feet of yarn does Stefanie color yellow?",
+      options:["6/2 feet","6/12 foot","2/6 foot","1/12 foot"],
+      answer:"6/2 feet",
+      explanation:"6 × 1/2: multiply 6 × 1 = 6. Keep denominator: 6/2 feet." },
+
+    { id:"A06", q:"Find the product: 8 × 2 1/5",
+      options:["16 1/5","17 3/5","17 4/5","18"],
+      answer:"17 3/5",
+      explanation:"Convert 2 1/5 to 11/5. Then 8 × 11 = 88. 88/5 = 17 3/5." },
+
+    { id:"A07", q:"Find the product: 9 × 1 1/4",
+      options:["9 1/4","10 1/4","11 1/4","13 1/4"],
+      answer:"11 1/4",
+      explanation:"Convert 1 1/4 to 5/4. Then 9 × 5 = 45. 45/4 = 11 1/4." },
+
+    { id:"A08", q:"Pedro uses 3/5 cup of carrots per batch of soup. On Monday he used 9/5 cups. How many batches did Pedro make on Monday?",
+      options:["2 batches","3 batches","4 batches","5 batches"],
+      answer:"3 batches",
+      explanation:"9/5 ÷ 3/5 = 9 ÷ 3 = 3 batches." },
+
+    { id:"A09", q:"Pedro uses 3/5 cup of carrots per batch of soup. On Tuesday he used 15/5 cups. How many batches did Pedro make on Tuesday?",
+      options:["3 batches","4 batches","5 batches","6 batches"],
+      answer:"5 batches",
+      explanation:"15/5 ÷ 3/5 = 15 ÷ 3 = 5 batches." },
+
+    { id:"A10", q:"Pedro uses 3/5 cup of carrots per batch of soup. On Wednesday he used 30/5 cups. How many batches did Pedro make on Wednesday?",
+      options:["8 batches","9 batches","10 batches","12 batches"],
+      answer:"10 batches",
+      explanation:"30/5 ÷ 3/5 = 30 ÷ 3 = 10 batches." },
+
+    { id:"A11", q:"Greg reads 2/3 hour each day. How many hours does Greg read after 6 days?",
+      options:["2/3 hour","2 hours","4 hours","12 hours"],
+      answer:"4 hours",
+      explanation:"6 × 2/3: 6 × 2 = 12. 12/3 = 4 hours." },
+
+    { id:"A12", q:"Diane uses 4/10 of a package of paper to print one copy of a story. She prints 3 copies. How many packages of paper does Diane use?",
+      options:["4/10 package","7/10 package","12/10 packages","3/4 package"],
+      answer:"12/10 packages",
+      explanation:"3 × 4/10: 3 × 4 = 12. Keep denominator: 12/10 packages." },
+
+    { id:"A13", q:"Carmen has 4 pencils that are each 7 1/2 inches long. How long, in inches, are all of Carmen's pencils?",
+      options:["28 inches","29 inches","30 inches","31 inches"],
+      answer:"30 inches",
+      explanation:"4 × 7 1/2: convert to 15/2. 4 × 15 = 60. 60/2 = 30 inches." },
+
+    { id:"A14", q:"David uses 3/8 cup of chocolate sauce for a single batch of brownies. He makes 5 batches for a party. How many cups of chocolate sauce did he use?",
+      options:["3/8 cup","8/5 cups","15/8 cups","15/3 cups"],
+      answer:"15/8 cups",
+      explanation:"5 × 3/8: 5 × 3 = 15. Keep denominator: 15/8 cups." },
+
+    { id:"A15", q:"Tricia rakes leaves on 3 different days. Each day she rakes for 1 1/3 hours. How many hours does Tricia rake leaves over the 3 days?",
+      options:["3 hours","3 1/3 hours","4 hours","4 1/3 hours"],
+      answer:"4 hours",
+      explanation:"3 × 1 1/3: convert to 4/3. 3 × 4 = 12. 12/3 = 4 hours." },
+
+    { id:"A16", q:"Steve spends 1/4 hour each day brushing his dog. How much total time does he spend after 6 days?",
+      options:["1/4 hour","6/4 hours","3/4 hour","2 hours"],
+      answer:"6/4 hours",
+      explanation:"6 × 1/4: 6 × 1 = 6. Keep denominator: 6/4 hours.",
+      hint:"Multiply the whole number by the numerator, keep the denominator." },
+
+    { id:"A17", q:"Steve brushes his dog 6 days each week for 3 weeks. Each session is 1/4 hour. How many total hours does Steve spend brushing his dog after 3 weeks?",
+      options:["1 2/4 hours","3 hours","4 2/4 hours","18 hours"],
+      answer:"4 2/4 hours",
+      explanation:"6 days × 3 weeks = 18 days total. 18 × 1/4 = 18/4 = 4 2/4 hours." }
+  ],
+
+  B: [
+    // ── MC: Fraction × Whole ──
+    { id:"B01", q:"Which of these is the product of 6 × 3/4?",
+      options:["3/24","18/24","18/4","27/4"],
+      answer:"18/4",
+      explanation:"Multiply the numerator by the whole number: 6 × 3 = 18. Keep the denominator: 18/4." },
+
+    { id:"B02", q:"Which of these is the product of 8 × 1/2?",
+      options:["1/16","2/8","8/2","17/2"],
+      answer:"8/2",
+      explanation:"Multiply 8 × 1 = 8. Keep the denominator: 8/2." },
+
+    { id:"B03", q:"Miguel walked 1/5 mile each day he walked his dog. He walked his dog 6 days this week. How many miles did Miguel walk his dog this week?",
+      options:["6/5 miles","5/6 mile","6/30 mile","1/30 mile"],
+      answer:"6/5 miles",
+      explanation:"6 × 1/5: multiply 6 × 1 = 6. Keep denominator: 6/5 miles." },
+
+    { id:"B04", q:"Henry paints boards that are each 2/3 yard long. How many yards of board does Henry paint after he paints 4 boards?",
+      options:["2/12 yard","8/12 yard","3/8 yard","8/3 yards"],
+      answer:"8/3 yards",
+      explanation:"4 × 2/3: multiply 4 × 2 = 8. Keep denominator: 8/3 yards." },
+
+    { id:"B05", q:"Namiko visits a museum with 5 science exhibits. She spends 3/4 hour at each exhibit. How many hours does Namiko spend at the science exhibits?",
+      options:["3/20 hour","15/20 hour","15/4 hours","23/4 hours"],
+      answer:"15/4 hours",
+      explanation:"5 × 3/4: multiply 5 × 3 = 15. Keep denominator: 15/4 hours." },
+
+    { id:"B06", q:"Find the product: 5 × 2 2/3",
+      options:["10 2/3","12 1/3","13 1/3","13 2/3"],
+      answer:"13 1/3",
+      explanation:"Convert 2 2/3 to 8/3. Then 5 × 8 = 40. 40/3 = 13 1/3." },
+
+    { id:"B07", q:"Find the product: 2 × 3 4/10",
+      options:["6 4/10","6 8/10","7 4/10","7 8/10"],
+      answer:"6 8/10",
+      explanation:"Convert 3 4/10 to 34/10. Then 2 × 34 = 68. 68/10 = 6 8/10." },
+
+    { id:"B08", q:"Wan uses 2/3 ounce of glitter per poster. On Wednesday he used 6/3 ounces. How many posters did Wan make on Wednesday?",
+      options:["2 posters","3 posters","4 posters","6 posters"],
+      answer:"3 posters",
+      explanation:"6/3 ÷ 2/3 = 6 ÷ 2 = 3 posters." },
+
+    { id:"B09", q:"Wan uses 2/3 ounce of glitter per poster. On Thursday he used 12/3 ounces. How many posters did Wan make on Thursday?",
+      options:["4 posters","6 posters","8 posters","9 posters"],
+      answer:"6 posters",
+      explanation:"12/3 ÷ 2/3 = 12 ÷ 2 = 6 posters." },
+
+    { id:"B10", q:"Wan uses 2/3 ounce of glitter per poster. On Saturday he used 18/3 ounces. How many posters did Wan make on Saturday?",
+      options:["6 posters","7 posters","9 posters","12 posters"],
+      answer:"9 posters",
+      explanation:"18/3 ÷ 2/3 = 18 ÷ 2 = 9 posters." },
+
+    { id:"B11", q:"Sarah plays piano 3/5 hour each day. How many hours does Sarah play piano after 3 days?",
+      options:["3/5 hour","6/5 hours","9/5 hours","15/5 hours"],
+      answer:"9/5 hours",
+      explanation:"3 × 3/5: 3 × 3 = 9. Keep denominator: 9/5 hours." },
+
+    { id:"B12", q:"Larry uses 3/6 pound of seeds to plant 1 section of his garden. He plants 4 sections. How many pounds of seeds does Larry use?",
+      options:["3/6 pound","7/6 pounds","12/6 pounds","12/3 pounds"],
+      answer:"12/6 pounds",
+      explanation:"4 × 3/6: 4 × 3 = 12. Keep denominator: 12/6 pounds." },
+
+    { id:"B13", q:"Lynn has 8 baseballs that are each 5 1/4 ounces. What is the weight, in ounces, of Lynn's baseballs?",
+      options:["40 ounces","40 2/4 ounces","41 ounces","42 ounces"],
+      answer:"42 ounces",
+      explanation:"8 × 5 1/4: convert to 21/4. 8 × 21 = 168. 168/4 = 42 ounces." },
+
+    { id:"B14", q:"Vidal uses 2/4 cup of milk for 1 batch of a recipe. He makes 4 batches. How many cups of milk does he need?",
+      options:["2/4 cup","4/8 cup","8/4 cups","6/4 cups"],
+      answer:"8/4 cups",
+      explanation:"4 × 2/4: 4 × 2 = 8. Keep denominator: 8/4 cups." },
+
+    { id:"B15", q:"Fredrick collects 3 rocks for his rock collection. Each rock weighs 1 1/8 pounds. How many pounds of rocks does Fredrick collect?",
+      options:["3 pounds","3 1/8 pounds","3 3/8 pounds","4 1/8 pounds"],
+      answer:"3 3/8 pounds",
+      explanation:"3 × 1 1/8: convert to 9/8. 3 × 9 = 27. 27/8 = 3 3/8 pounds." },
+
+    { id:"B16", q:"Brooke practiced 1/4 hour each day for band. How much total time did she practice after 5 days?",
+      options:["1/4 hour","5/4 hours","3/4 hour","2 hours"],
+      answer:"5/4 hours",
+      explanation:"5 × 1/4: 5 × 1 = 5. Keep denominator: 5/4 hours.",
+      hint:"Multiply the whole number by the numerator, keep the denominator." },
+
+    { id:"B17", q:"Brooke practiced band 5 days each week for 4 weeks. Each session is 1/4 hour. How many total hours did Brooke practice after 4 weeks?",
+      options:["4 hours","5 hours","5/4 hours","20 hours"],
+      answer:"5 hours",
+      explanation:"5 days × 4 weeks = 20 days total. 20 × 1/4 = 20/4 = 5 hours." }
+  ],
+
+  C: [
+    { id:"C01", q:"Which of these is the product of 4 × 3/7?",
+      options:["3/28","7/12","12/7","12/28"],
+      answer:"12/7",
+      explanation:"Multiply the numerator by the whole number: 4 × 3 = 12. Keep the denominator: 12/7." },
+
+    { id:"C02", q:"Which of these is the product of 7 × 1/3?",
+      options:["1/21","3/7","7/3","8/3"],
+      answer:"7/3",
+      explanation:"Multiply 7 × 1 = 7. Keep the denominator: 7/3." },
+
+    { id:"C03", q:"Mia jogs 1/3 mile each morning. She jogged 4 mornings this week. How many miles did Mia jog this week?",
+      options:["1/3 mile","3/4 mile","4/3 miles","4/12 mile"],
+      answer:"4/3 miles",
+      explanation:"4 × 1/3: multiply 4 × 1 = 4. Keep denominator: 4/3 miles." },
+
+    { id:"C04", q:"A farmer plants flowers on 3/8 acre of land each week. How many acres does the farmer plant after 5 weeks?",
+      options:["3/40 acre","8/15 acre","15/8 acres","15/40 acres"],
+      answer:"15/8 acres",
+      explanation:"5 × 3/8: multiply 5 × 3 = 15. Keep denominator: 15/8 acres." },
+
+    { id:"C05", q:"Owen fills 1/4 of a bucket with sand each trip to the beach. He makes 6 trips. How much of a bucket does Owen fill in all?",
+      options:["1/4 bucket","5/4 buckets","6/4 buckets","6/24 bucket"],
+      answer:"6/4 buckets",
+      explanation:"6 × 1/4: multiply 6 × 1 = 6. Keep denominator: 6/4 buckets." },
+
+    { id:"C06", q:"Find the product: 6 × 2 1/4",
+      options:["12 1/4","13 1/4","13 2/4","14 1/4"],
+      answer:"13 2/4",
+      explanation:"Convert 2 1/4 to 9/4. Then 6 × 9 = 54. 54/4 = 13 2/4." },
+
+    { id:"C07", q:"Find the product: 4 × 3 2/5",
+      options:["12 2/5","13 1/5","13 3/5","14 2/5"],
+      answer:"13 3/5",
+      explanation:"Convert 3 2/5 to 17/5. Then 4 × 17 = 68. 68/5 = 13 3/5." },
+
+    { id:"C08", q:"Rosa uses 2/4 cup of flour for each batch of muffins she bakes. On Friday she used 8/4 cups. How many batches did Rosa make on Friday?",
+      options:["2 batches","3 batches","4 batches","6 batches"],
+      answer:"4 batches",
+      explanation:"8/4 ÷ 2/4 = 8 ÷ 2 = 4 batches." },
+
+    { id:"C09", q:"Rosa uses 2/4 cup of flour for each batch of muffins she bakes. On Saturday she used 12/4 cups. How many batches did Rosa make on Saturday?",
+      options:["4 batches","5 batches","6 batches","8 batches"],
+      answer:"6 batches",
+      explanation:"12/4 ÷ 2/4 = 12 ÷ 2 = 6 batches." },
+
+    { id:"C10", q:"Rosa uses 2/4 cup of flour for each batch of muffins she bakes. On Sunday she used 20/4 cups. How many batches did Rosa make on Sunday?",
+      options:["8 batches","9 batches","10 batches","12 batches"],
+      answer:"10 batches",
+      explanation:"20/4 ÷ 2/4 = 20 ÷ 2 = 10 batches." },
+
+    { id:"C11", q:"James drinks 3/4 cup of juice each morning. How many cups does James drink after 5 mornings?",
+      options:["3/4 cup","7/4 cups","15/4 cups","15/20 cup"],
+      answer:"15/4 cups",
+      explanation:"5 × 3/4: 5 × 3 = 15. Keep denominator: 15/4 cups." },
+
+    { id:"C12", q:"Nina uses 5/6 yard of ribbon to wrap one gift. She wraps 6 gifts. How many yards of ribbon does Nina use?",
+      options:["5/6 yard","11/6 yards","30/6 yards","5/36 yard"],
+      answer:"30/6 yards",
+      explanation:"6 × 5/6: 6 × 5 = 30. Keep denominator: 30/6 yards." },
+
+    { id:"C13", q:"Leo has 3 shelves of books. Each shelf holds 6 1/2 feet of books. How many feet of books does Leo have in all?",
+      options:["18 feet","18 1/2 feet","19 feet","19 1/2 feet"],
+      answer:"19 1/2 feet",
+      explanation:"3 × 6 1/2: convert to 13/2. 3 × 13 = 39. 39/2 = 19 1/2 feet." },
+
+    { id:"C14", q:"Keisha runs 2/5 mile each lap around the track. She runs 4 laps. How many miles does Keisha run?",
+      options:["2/5 mile","6/5 miles","8/5 miles","8/20 mile"],
+      answer:"8/5 miles",
+      explanation:"4 × 2/5: 4 × 2 = 8. Keep denominator: 8/5 miles." },
+
+    { id:"C15", q:"Marco volunteers at the library for 1 2/3 hours each visit. He visits 5 times. How many hours does Marco volunteer in all?",
+      options:["5 2/3 hours","6 1/3 hours","7 2/3 hours","8 1/3 hours"],
+      answer:"8 1/3 hours",
+      explanation:"5 × 1 2/3: convert to 5/3. 5 × 5 = 25. 25/3 = 8 1/3 hours." },
+
+    { id:"C16", q:"Chloe waters her plants for 1/3 hour each day. How much total time does she spend after 7 days?",
+      options:["1/3 hour","4/3 hours","7/3 hours","2 hours"],
+      answer:"7/3 hours",
+      explanation:"7 × 1/3: 7 × 1 = 7. Keep denominator: 7/3 hours.",
+      hint:"Multiply the whole number by the numerator, keep the denominator." },
+
+    { id:"C17", q:"Chloe waters her plants 7 days each week for 4 weeks. Each session is 1/3 hour. How many total hours does Chloe spend watering after 4 weeks?",
+      options:["7/3 hours","7 hours","9 1/3 hours","28 hours"],
+      answer:"9 1/3 hours",
+      explanation:"7 days × 4 weeks = 28 days total. 28 × 1/3 = 28/3 = 9 1/3 hours." }
+  ]
+};
+
+/* ══════════════════════════════════════════
+   WORD-BY-WORD HIGHLIGHT ENGINE
+══════════════════════════════════════════ */
+let hlSpans = [];
+let hlIdx = 0;
+let isReading = false;
+
+
+function clearHighlights(){
+  hlSpans.forEach(s=>s && s.classList.remove('hl'));
+  hlIdx = 0;
+}
+
+function stopReading(){
+  window.speechSynthesis.cancel();
+  isReading = false;
+  clearHighlights();
+  const btn = document.getElementById('speak-q-btn');
+  if(btn){ btn.innerText='🔊'; btn.title='Read question aloud'; }
+}
+
+/* ══════════════════════════════════════════
+   READING TIMER STATE
+══════════════════════════════════════════ */
+const READING_LOCK_SECS = 12;   // seconds answers stay locked per question
+const SOAK_SECS = 8;             // seconds before Next button appears after confirming
+
+let readingInterval = null;
+let readingUnlocked = false;
+let readingSeconds = READING_LOCK_SECS;
+
+let nextInterval = null;
+let nextSeconds = SOAK_SECS;
+
+function startReadingTimer(){
+  clearInterval(readingInterval);
+  readingUnlocked = false;
+  readingSeconds = READING_LOCK_SECS;
+  const bar = document.getElementById('reading-timer-bar');
+  const fill = document.getElementById('reading-fill');
+  const count = document.getElementById('reading-count');
+  bar.style.display = 'flex';
+  fill.style.width = '0%';
+  count.innerText = readingSeconds;
+
+  // Lock all answer buttons
+  document.querySelectorAll('.answer-btn').forEach(b=>{
+    b.disabled = true;
+    b.classList.add('locked-choice');
+  });
+
+  readingInterval = setInterval(()=>{
+    readingSeconds--;
+    count.innerText = Math.max(0, readingSeconds);
+    fill.style.width = `${((READING_LOCK_SECS - readingSeconds) / READING_LOCK_SECS) * 100}%`;
+    if(readingSeconds <= 0){
+      clearInterval(readingInterval);
+      readingUnlocked = true;
+      bar.style.display = 'none';
+      // Unlock answer buttons
+      document.querySelectorAll('.answer-btn').forEach(b=>{
+        b.disabled = false;
+        b.classList.remove('locked-choice');
+      });
+    }
+  }, 1000);
+}
+
+function startNextTimer(callback){
+  clearInterval(nextInterval);
+  nextSeconds = SOAK_SECS;
+  const bar = document.getElementById('next-timer-bar');
+  const fill = document.getElementById('next-fill');
+  const count = document.getElementById('next-count');
+  bar.classList.remove('hidden');
+  fill.style.width = '100%';
+  count.innerText = nextSeconds;
+
+  nextInterval = setInterval(()=>{
+    nextSeconds--;
+    count.innerText = Math.max(0, nextSeconds);
+    fill.style.width = `${(nextSeconds / SOAK_SECS) * 100}%`;
+    if(nextSeconds <= 0){
+      clearInterval(nextInterval);
+      bar.classList.add('hidden');
+      document.getElementById('next-btn').classList.remove('hidden');
+      document.getElementById('next-btn').focus();
+      if(callback) callback();
+    }
+  }, 1000);
+}
+
+/* ── COMPLETED-FORM TRACKING ── */
+// Returns a Set of form letters ('A','B','C') the student has already scored
+function getCompletedForms(studentName){
+  if(!studentName) return new Set();
+  const h = JSON.parse(localStorage.getItem('mathModule16Scores') || '[]');
+  const done = new Set();
+  h.forEach(r => { if(r.name === studentName && r.form) done.add(r.form); });
+  return done;
+}
+
+// Locks/unlocks each form button based on the student's score history.
+// Called after login (when there is no in-progress save to force-resume).
+function applyFormLocks(studentName){
+  if(!studentName) return;
+  const completed = getCompletedForms(studentName);
+  ['A','B','C'].forEach(form => {
+    const btn = document.getElementById(`form-${form.toLowerCase()}-btn`);
+    if(!btn) return;
+    if(completed.has(form) && !unlockedForms.has(form)){
+      // Already scored and teacher hasn't unlocked it — show as locked
+      btn.disabled = false;
+      btn.classList.add('form-btn-locked');
+      btn.innerHTML = `🔒 Form ${form}<span class="form-btn-sub">Already completed</span>`;
+      btn.onclick = () => app.unlockFormWithPin(form);
+    } else {
+      // Not yet scored, or teacher unlocked it for retry
+      btn.disabled = false;
+      btn.classList.remove('form-btn-locked');
+      btn.innerHTML = `📝 Form ${form}`;
+      btn.onclick = () => app.attemptLogin(form);
+    }
+  });
+}
+
+/* ══════════════════════════════════════════
+   APP OBJECT
+══════════════════════════════════════════ */
+const app = {
+  currentTest:[], currentIndex:0, score:0, selectedAnswer:null,
+  currentForm:null, streak:0, missedQuestions:[], timerOn:false,
+  timerSeconds:0, timerInterval:null, studentName:"",
+
+  init(){
+    // Resume container is always hidden at page load — only revealed after login
+    document.getElementById('resume-container').classList.add('hidden');
+  },
+
+  /* ── Name dropdown changed → reveal PIN field, adjust label ── */
+  onNameSelect(){
+    const val = document.getElementById('name-select').value;
+    const pinSection = document.getElementById('pin-section');
+    const guestNameSection = document.getElementById('guest-name-section');
+    const pinLabel = document.getElementById('pin-label');
+    const errEl = document.getElementById('login-error');
+    errEl.innerText = '';
+    errEl.style.color = '#c0392b';
+
+    // 🔒 If someone was already logged in, changing the dropdown resets auth
+    // so the previous student's session can't be piggybacked
+    if(loggedInName){
+      loggedInName = '';
+      ['A','B','C'].forEach(form => {
+        const btn = document.getElementById(`form-${form.toLowerCase()}-btn`);
+        btn.disabled = true;
+        btn.style.opacity = '0.4';
+        btn.classList.remove('form-btn-locked');
+        btn.innerHTML = `📝 Form ${form}`;
+        btn.onclick = () => app.attemptLogin(form);
+      });
+      document.getElementById('resume-container').classList.add('hidden');
+      document.getElementById('scores-btn-wrap').classList.add('hidden');
+    }
+
+    if(!val){
+      pinSection.classList.add('hidden');
+      guestNameSection.classList.add('hidden');
+      document.getElementById('student-pin').value = '';
+      document.getElementById('guest-display-name').value = '';
+      return;
+    }
+
+    const isGuest = val.startsWith('GUEST:');
+    pinSection.classList.remove('hidden');
+
+    if(isGuest){
+      pinLabel.textContent = '🔒 Enter your guest code:';
+      document.getElementById('student-pin').placeholder = 'Guest code...';
+      guestNameSection.classList.remove('hidden');
+    } else {
+      pinLabel.textContent = '🔒 Enter your student number:';
+      document.getElementById('student-pin').placeholder = 'Student number...';
+      guestNameSection.classList.add('hidden');
+    }
+
+    document.getElementById('student-pin').focus();
+  },
+
+  /* ── Validate login, then enable form buttons ── */
+  attemptLogin(formOverride){
+    // Already authenticated — a form button was clicked directly, just start
+    if(loggedInName && formOverride){
+      this.startTest(formOverride, loggedInName);
+      return;
+    }
+
+    const val    = document.getElementById('name-select').value;
+    const pinVal = document.getElementById('student-pin').value.trim();
+    const errEl  = document.getElementById('login-error');
+    errEl.innerText = '';
+    errEl.style.color = '#c0392b';
+
+    if(!val){ errEl.innerText = '⚠️ Please select your name first.'; return; }
+    if(!pinVal){ errEl.innerText = '⚠️ Please enter your student number.'; return; }
+
+    const isGuest = val.startsWith('GUEST:');
+
+    if(isGuest){
+      const code = val.replace('GUEST:', '');
+      if(pinVal !== code){
+        errEl.innerText = '❌ Incorrect guest code. Try again.';
+        document.getElementById('student-pin').value = '';
+        document.getElementById('student-pin').focus();
+        return;
+      }
+      const dispName = document.getElementById('guest-display-name').value.trim();
+      if(!dispName){
+        errEl.innerText = '⚠️ Please enter your first name.';
+        document.getElementById('guest-display-name').focus();
+        return;
+      }
+      loggedInName = `${GUEST_SLOTS[code]} - ${dispName}`;
+    } else {
+      const student = ROSTER.find(s => s.name === val);
+      if(!student || pinVal !== student.id){
+        errEl.innerText = '❌ Incorrect student number. Try again.';
+        document.getElementById('student-pin').value = '';
+        document.getElementById('student-pin').focus();
+        return;
+      }
+      loggedInName = val;
+    }
+
+    // ✅ Login successful — show confirmation
+    errEl.style.color = '#27ae60';
+    errEl.innerText = `✅ Logged in as ${getFirstName(loggedInName)} — choose a form below!`;
+
+    // Unlock form buttons
+    document.getElementById('form-a-btn').disabled = false;
+    document.getElementById('form-a-btn').style.opacity = '1';
+    document.getElementById('form-b-btn').disabled = false;
+    document.getElementById('form-b-btn').style.opacity = '1';
+    document.getElementById('form-c-btn').disabled = false;
+    document.getElementById('form-c-btn').style.opacity = '1';
+
+    // Show Resume button only if this student has an unfinished session
+    this.checkSavedProgress(loggedInName);
+
+    // Reveal Score History button now that someone is logged in
+    document.getElementById('scores-btn-wrap').classList.remove('hidden');
+
+    if(formOverride) this.startTest(formOverride, loggedInName);
+  },
+
+  checkSavedProgress(forName){
+    const rc = document.getElementById('resume-container');
+    if(!forName){ rc.classList.add('hidden'); return; }
+
+    const saved = localStorage.getItem('mathModule16Review');
+    if(saved){
+      const d = JSON.parse(saved);
+      if(d.studentName === forName){
+        // ↩️ This student has unfinished work — show Resume, lock ALL form buttons
+        rc.classList.remove('hidden');
+        ['a','b','c'].forEach(f => {
+          const btn = document.getElementById(`form-${f}-btn`);
+          btn.disabled = true;
+          btn.style.opacity = '0.4';
+        });
+        return;
+      }
+    }
+
+    // No in-progress save for this student — hide Resume, apply per-form completion locks
+    rc.classList.add('hidden');
+    applyFormLocks(forName);
+  },
+
+  resumeTest(){
+    const saved = localStorage.getItem('mathModule16Review');
+    if(!saved) return;
+    const d = JSON.parse(saved);
+    Object.assign(this,{
+      currentTest:d.currentTest, currentIndex:d.currentIndex, score:d.score,
+      currentForm:d.currentForm, streak:0,
+      missedQuestions:d.missedQuestions||[], studentName:d.studentName||"",
+      timerSeconds:d.timerSeconds||0
+    });
+    this._showQuiz(); this.showQuestion(); stopConfetti();
+  },
+
+  startTest(form, nameArg){
+    if(!tests[form]) return;
+    tabSwitchCount = 0;   // reset per-test — don't carry over switches from a previous form
+    this.studentName = nameArg || loggedInName || "Student";
+    localStorage.removeItem('mathModule16Review');
+    this.currentForm = form;
+    this.currentTest = JSON.parse(JSON.stringify(tests[form]));
+    this.currentTest.sort(()=>Math.random()-0.5);
+    this.currentTest.forEach(q=>q.options.sort(()=>Math.random()-0.5));
+    this.currentIndex=0; this.score=0; this.streak=0; this.missedQuestions=[];
+    this.timerSeconds=0;
+    this.saveProgress(); this._showQuiz(); this.showQuestion(); stopConfetti();
+  },
+
+  _showQuiz(){
+    ['start-screen','end-screen','scoreboard-screen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    this.autoStartTimer();
+  },
+
+  saveProgress(){
+    localStorage.setItem('mathModule16Review', JSON.stringify({
+      currentTest:this.currentTest, currentIndex:this.currentIndex, score:this.score,
+      currentForm:this.currentForm, streak:this.streak,
+      missedQuestions:this.missedQuestions, studentName:this.studentName,
+      timerSeconds:this.timerSeconds
+    }));
+  },
+
+  showQuestion(){
+    stopReading();
+    clearInterval(readingInterval);
+    clearInterval(nextInterval);
+    document.getElementById('next-timer-bar').classList.add('hidden');
+    this.selectedAnswer = null;
+    const q = this.currentTest[this.currentIndex];
+    const total = this.currentTest.length;
+
+    document.getElementById('progress-text').innerText = `Question ${this.currentIndex+1} of ${total}`;
+    document.getElementById('score-text').innerText = `${getFirstName(this.studentName)} · Score: ${this.score}`;
+    document.getElementById('progress-fill').style.width = `${(this.currentIndex/total)*100}%`;
+
+    // Build question with word spans for highlight
+    const qPlain = q.q;
+    const qEl = document.getElementById('question-text');
+    qEl.innerHTML = '';
+    let qHTML = formatMathText(qPlain);
+    if(q.hint) qHTML += `<div style="font-size:0.85rem;color:#666;background:#f0f0f0;border-radius:8px;padding:6px 10px;margin-top:8px;">💡 Hint: ${q.hint}</div>`;
+    qEl.innerHTML = qHTML;
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('confirm-btn').classList.add('hidden');
+    document.getElementById('next-btn').classList.add('hidden');
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    q.options.forEach(opt=>{
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn locked-choice';
+      btn.disabled = true;
+      const ts = document.createElement('span');
+      ts.innerHTML = formatMathText(opt); ts.style.flex='1';
+      const spk = document.createElement('span');
+      spk.className='speak-btn-mini'; spk.innerText='🔊';
+      spk.onclick = e=>{ e.stopPropagation(); app.speakText(opt); };
+      btn.appendChild(ts); btn.appendChild(spk);
+      btn.onclick = e=>{
+        if(e.target.classList.contains('speak-btn-mini')) return;
+        this.selectAnswer(opt,btn);
+      };
+      answersDiv.appendChild(btn);
+    });
+
+    this._renderStreak();
+    startReadingTimer();
+  },
+
+  selectAnswer(answer, btn){
+    if(!readingUnlocked) return;
+    this.selectedAnswer = answer;
+    document.querySelectorAll('.answer-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('confirm-btn').classList.remove('hidden');
+  },
+
+  confirmAnswer(){
+    if(!this.selectedAnswer) return;
+    window.speechSynthesis.cancel();
+    clearInterval(readingInterval);
+    const q = this.currentTest[this.currentIndex];
+    const btns = document.querySelectorAll('.answer-btn');
+    const fb = document.getElementById('feedback');
+    btns.forEach(b=>b.disabled=true);
+    document.getElementById('confirm-btn').classList.add('hidden');
+
+    const ok = this.selectedAnswer === q.answer;
+    if(ok){
+      this.score++; this.streak++;
+      fb.style.cssText='background:#d4edda;color:#155724;border-color:#c3e6cb;display:block;margin-top:18px;padding:18px;border-radius:12px;border:2px solid;';
+      fb.innerHTML=`<strong>✅ Correct!</strong><br>${formatMathText(q.explanation)}`;
+      Array.from(btns).find(b=>b.classList.contains('selected')).classList.add('correct');
+    } else {
+      this.streak=0;
+      this.missedQuestions.push({id:q.id, q:q.q, yourAnswer:this.selectedAnswer, correct:q.answer});
+      fb.style.cssText='background:#f8d7da;color:#721c24;border-color:#f5c6cb;display:block;margin-top:18px;padding:18px;border-radius:12px;border:2px solid;';
+      fb.innerHTML=`<strong>❌ Not quite.</strong><br>Correct Answer: ${formatMathText(q.answer)}<br>${formatMathText(q.explanation)}`;
+      Array.from(btns).find(b=>b.classList.contains('selected')).classList.add('incorrect');
+    }
+    this._renderStreak();
+    this.saveProgress();
+    // Partial dashboard report every 5 questions
+    const qNum = this.currentIndex + 1;
+    if(qNum % 5 === 0) submitScorePartial();
+    startNextTimer(null);
+  },
+
+  nextQuestion(){
+    clearInterval(nextInterval);
+    document.getElementById('next-timer-bar').classList.add('hidden');
+    document.getElementById('next-btn').classList.add('hidden');
+    window.speechSynthesis.cancel();
+    this.currentIndex++;
+    if(this.currentIndex < this.currentTest.length){ this.showQuestion(); }
+    else this.endTest();
+  },
+
+  endTest(){
+    this.stopTimerEngine();
+    clearInterval(readingInterval);
+    clearInterval(nextInterval);
+    localStorage.removeItem('mathModule16Review');
+    this.checkSavedProgress();
+    this.saveScoreToHistory();
+    submitScoreFinal();
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+
+    const pct = Math.round((this.score/this.currentTest.length)*100);
+    document.getElementById('final-score-sub').innerText =
+      `${this.studentName} — Form ${this.currentForm} — ${this.score} out of ${this.currentTest.length}`;
+
+    const fp = document.getElementById('final-percent');
+    fp.innerText = `${pct}%`;
+    fp.classList.remove('revealed');
+    setTimeout(()=>fp.classList.add('revealed'), 60);
+
+    const msgs = [[100,"🌟 Perfect Score! Amazing job!"],[80,"👍 Great work! You are ready."],[60,"👌 Good effort. Keep practicing!"],[0,"💡 Don't give up! Review and try again."]];
+    document.getElementById('final-msg').innerText = msgs.find(([k])=>pct>=k)[1];
+
+    const ms = document.getElementById('missed-section');
+    const mi = document.getElementById('missed-items');
+    if(this.missedQuestions.length){
+      ms.classList.remove('hidden');
+      mi.innerHTML = this.missedQuestions.map(m=>`
+        <div class="missed-item">
+          <div class="mi-label">❌ Missed</div>
+          <div style="margin:3px 0;">${formatMathText(m.q)}</div>
+          <div>Your answer: <span style="color:#dc3545;">${formatMathText(m.yourAnswer)}</span> &nbsp; ✅ Correct: <strong style="color:#155724;">${formatMathText(m.correct)}</strong></div>
+        </div>`).join('');
+    } else { ms.classList.add('hidden'); }
+
+    if(pct>=70) startConfetti();
+  },
+
+  tryAgain(){
+    stopConfetti();
+    const completed = getCompletedForms(this.studentName);
+    if(completed.has(this.currentForm)){
+      // Score already recorded — require Teacher PIN before allowing another attempt
+      this.showPinModal(
+        `🔓 Try Again — Form ${this.currentForm}`,
+        `A score for Form ${this.currentForm} is already recorded for ${getFirstName(this.studentName)}. Enter Teacher PIN to allow another attempt.`,
+        () => { app.startTest(app.currentForm, app.studentName); }
+      );
+    } else {
+      this.startTest(this.currentForm, this.studentName);
+    }
+  },
+
+  restart(){
+    stopConfetti(); this.stopTimerEngine();
+    clearInterval(readingInterval); clearInterval(nextInterval);
+    ['end-screen','scoreboard-screen','quiz-screen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+    document.getElementById('start-screen').classList.remove('hidden');
+    // Reset login UI
+    document.getElementById('name-select').value = '';
+    document.getElementById('student-pin').value = '';
+    document.getElementById('guest-display-name').value = '';
+    document.getElementById('login-error').innerText = '';
+    document.getElementById('login-error').style.color = '#c0392b';
+    document.getElementById('pin-section').classList.add('hidden');
+    document.getElementById('guest-name-section').classList.add('hidden');
+    document.getElementById('form-a-btn').disabled = true;
+    document.getElementById('form-a-btn').style.opacity = '0.4';
+    document.getElementById('form-b-btn').disabled = true;
+    document.getElementById('form-b-btn').style.opacity = '0.4';
+    document.getElementById('form-c-btn').disabled = true;
+    document.getElementById('form-c-btn').style.opacity = '0.4';
+    loggedInName = '';
+    // Clear all quiz state so no stale data lingers after returning to Home
+    this.studentName    = '';
+    this.timerOn        = false;
+    this.timerSeconds   = 0;
+    this.currentIndex   = 0;
+    this.score          = 0;
+    this.streak         = 0;
+    this.currentTest    = [];
+    this.missedQuestions= [];
+    this.currentForm    = null;
+    this.selectedAnswer = null;
+    unlockedForms = new Set();
+    document.getElementById('resume-container').classList.add('hidden');
+    document.getElementById('scores-btn-wrap').classList.add('hidden');
+    // Restore form buttons to their base state (content + handler)
+    ['A','B','C'].forEach(form => {
+      const btn = document.getElementById(`form-${form.toLowerCase()}-btn`);
+      btn.classList.remove('form-btn-locked');
+      btn.innerHTML = `📝 Form ${form}`;
+      btn.onclick = () => app.attemptLogin(form);
+    });
+  },
+
+  speakQuestion(){
+    const q = this.currentTest[this.currentIndex];
+    if(!q) return;
+    if(isReading){ stopReading(); return; }
+    const btn = document.getElementById('speak-q-btn');
+    btn.innerText = '🔇';
+
+    // SPOKEN text goes only to the speech engine — never touches the display
+    const spokenText = convertToSpokenText(q.q);
+
+    // VISUAL text stays exactly as formatMathText rendered it
+    // We wrap the existing rendered words in highlight spans WITHOUT changing what's displayed
+    // Strategy: split the ORIGINAL (pre-format) words, wrap each rendered token in a span
+    const qEl = document.getElementById('question-text');
+    const originalWords = q.q.split(/\s+/);
+
+    // Re-render visual HTML with each original word wrapped in a highlight span
+    let qHTML = '';
+    originalWords.forEach((w, i) => {
+      qHTML += `<span class="wrd" id="wrd${i}">${formatMathText(w)}</span> `;
+    });
+    if(q.hint) qHTML += `<div style="font-size:0.85rem;color:#666;background:#f0f0f0;border-radius:8px;padding:6px 10px;margin-top:8px;">💡 Hint: ${q.hint}</div>`;
+    qEl.innerHTML = qHTML;
+    hlSpans = originalWords.map((_,i) => document.getElementById('wrd'+i));
+    hlIdx = 0;
+
+    const utt = new SpeechSynthesisUtterance(spokenText);
+    utt.rate = 0.95;
+    isReading = true;
+
+    utt.onboundary = e=>{
+      if(e.name !== 'word') return;
+      clearHighlights();
+      if(hlSpans[hlIdx]) hlSpans[hlIdx].classList.add('hl');
+      hlIdx++;
+    };
+    utt.onend = ()=>{ stopReading(); };
+    utt.onerror = ()=>{ stopReading(); };
+
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utt);
+  },
+
+  speakText(text){ window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance(convertToSpokenText(text))); },
+
+  _renderStreak(){
+    const bar = document.getElementById('streak-bar');
+    if(this.streak>=3){
+      const flames = '🔥'.repeat(Math.min(this.streak,8));
+      bar.innerHTML=`<span style="font-size:0.95rem;color:#e67e22;">${flames} ${this.streak} in a row! Keep it up!</span>`;
+    } else { bar.innerHTML=''; }
+  },
+
+  autoStartTimer(){
+    this.stopTimerEngine();
+    // timerSeconds is pre-set: 0 for a fresh start (via startTest) or
+    // the restored elapsed value (via resumeTest → Object.assign)
+    this.timerOn = true;
+    this._tickTimer();
+    this.timerInterval = setInterval(()=>{ this.timerSeconds++; this._tickTimer(); this.saveProgress(); }, 1000);
+  },
+
+  _tickTimer(){
+    const m = String(Math.floor(this.timerSeconds/60)).padStart(2,'0');
+    const s = String(this.timerSeconds%60).padStart(2,'0');
+    const d = document.getElementById('timer-display');
+    if(d){ d.innerText=`${m}:${s}`; d.classList.toggle('warning', this.timerSeconds>300); }
+  },
+
+  stopTimerEngine(){ if(this.timerInterval){clearInterval(this.timerInterval);this.timerInterval=null;} },
+
+  saveScoreToHistory(){
+    const h=JSON.parse(localStorage.getItem('mathModule16Scores')||'[]');
+    const date=new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    h.unshift({name:this.studentName,form:this.currentForm,score:this.score,total:this.currentTest.length,percent:Math.round((this.score/this.currentTest.length)*100),date});
+    localStorage.setItem('mathModule16Scores',JSON.stringify(h));
+  },
+
+  showScores(){
+    ['start-screen','end-screen','quiz-screen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+    document.getElementById('scoreboard-screen').classList.remove('hidden');
+    const h=JSON.parse(localStorage.getItem('mathModule16Scores')||'[]');
+    const ld=document.getElementById('score-list'), nm=document.getElementById('no-scores-msg');
+    if(!h.length){ld.innerHTML='';nm.style.display='block';return;}
+    nm.style.display='none';
+    let html=`<table class="scoreboard-table"><tr><th>Name</th><th>Form</th><th>Score</th><th>%</th><th>Date</th></tr>`;
+    h.forEach(r=>{
+      const cc=r.percent>=80?'score-good':r.percent>=60?'score-ok':'score-bad';
+      html+=`<tr><td>${r.name||'—'}</td><td>Form ${r.form}</td><td>${r.score}/${r.total}</td><td class="${cc}">${r.percent}%</td><td style="font-size:0.82rem;color:#666;">${r.date}</td></tr>`;
+    });
+    ld.innerHTML=html+'</table>';
+  },
+
+  closeScores(){
+    document.getElementById('scoreboard-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+  },
+
+  clearScores(){
+    const panel = document.getElementById('clear-confirm-panel');
+    panel.classList.remove('hidden');
+    document.getElementById('clear-pin-input').value = '';
+    document.getElementById('clear-pin-error').innerText = '';
+    document.getElementById('clear-pin-input').focus();
+  },
+
+  confirmClearScores(){
+    const pin = document.getElementById('clear-pin-input').value.trim();
+    if(pin === '9377'){
+      localStorage.removeItem('mathModule16Scores');
+      document.getElementById('clear-confirm-panel').classList.add('hidden');
+      this.showScores();
+    } else {
+      document.getElementById('clear-pin-error').innerText = '❌ Incorrect PIN. Try again.';
+      document.getElementById('clear-pin-input').value = '';
+      document.getElementById('clear-pin-input').focus();
+    }
+  },
+
+  cancelClearScores(){
+    document.getElementById('clear-confirm-panel').classList.add('hidden');
+  },
+
+  /* ── GLOBAL PIN MODAL ── */
+  // Call this from anywhere. onSuccess fires only after a correct PIN.
+  showPinModal(title, msg, onSuccess){
+    pinModalCallback = onSuccess;
+    document.getElementById('pin-modal-title').innerText = title;
+    document.getElementById('pin-modal-msg').innerText   = msg;
+    document.getElementById('pin-modal-input').value     = '';
+    document.getElementById('pin-modal-error').innerText = '';
+    document.getElementById('pin-modal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('pin-modal-input').focus(), 80);
+  },
+
+  confirmPinModal(){
+    const pin = document.getElementById('pin-modal-input').value.trim();
+    if(pin === '9377'){
+      document.getElementById('pin-modal').classList.add('hidden');
+      const cb = pinModalCallback;
+      pinModalCallback = null;
+      if(cb) cb();
+    } else {
+      document.getElementById('pin-modal-error').innerText = '❌ Incorrect PIN. Try again.';
+      document.getElementById('pin-modal-input').value = '';
+      document.getElementById('pin-modal-input').focus();
+    }
+  },
+
+  cancelPinModal(){
+    document.getElementById('pin-modal').classList.add('hidden');
+    pinModalCallback = null;
+  },
+
+  /* ── DISCARD IN-PROGRESS WORK (requires Teacher PIN) ── */
+  discardProgress(){
+    this.showPinModal(
+      '🗑️ Discard Progress',
+      'Enter Teacher PIN to clear the current in-progress test. The student will start fresh.',
+      () => {
+        localStorage.removeItem('mathModule16Review');
+        document.getElementById('resume-container').classList.add('hidden');
+        // Re-enable form buttons, then apply completion locks for this student
+        ['a','b','c'].forEach(f => {
+          const btn = document.getElementById(`form-${f}-btn`);
+          btn.disabled    = false;
+          btn.style.opacity = '1';
+        });
+        applyFormLocks(loggedInName);
+      }
+    );
+  },
+
+  /* ── UNLOCK A COMPLETED FORM FOR RETRY (requires Teacher PIN) ── */
+  unlockFormWithPin(form){
+    this.showPinModal(
+      `🔓 Unlock Form ${form}`,
+      `Form ${form} has already been recorded for ${getFirstName(loggedInName)}. Enter Teacher PIN to allow a retry.`,
+      () => {
+        unlockedForms.add(form);
+        app.startTest(form, loggedInName);
+      }
+    );
+  },
+
+  printResults(){
+    const h=JSON.parse(localStorage.getItem('mathModule16Scores')||'[]');
+    if(!h.length){
+      const nm = document.getElementById('no-scores-msg');
+      nm.style.display = 'block';
+      nm.style.color = '#c0392b';
+      nm.textContent = '⚠️ No scores to print yet!';
+      setTimeout(() => {
+        nm.style.color = '#999';
+        nm.textContent = 'No scores yet — take the review to record your first score!';
+      }, 3000);
+      return;
+    }
+    let html=`<html><head><title>Module 16 Scores</title><style>body{font-family:Arial,sans-serif;padding:20px;}h2{color:#d35400;}table{width:100%;border-collapse:collapse;margin-top:12px;}th,td{border:1px solid #ccc;padding:8px 12px;text-align:center;}th{background:#d35400;color:white;}.good{color:green;font-weight:bold;}.ok{color:orange;font-weight:bold;}.bad{color:red;font-weight:bold;}</style></head><body><h2>📊 Math Module 16 — Score Report</h2><p>Printed: ${new Date().toLocaleString()}</p><table><tr><th>Name</th><th>Form</th><th>Score</th><th>%</th><th>Date</th></tr>`;
+    h.forEach(r=>{const cc=r.percent>=80?'good':r.percent>=60?'ok':'bad';html+=`<tr><td>${r.name||'—'}</td><td>Form ${r.form}</td><td>${r.score}/${r.total}</td><td class="${cc}">${r.percent}%</td><td>${r.date}</td></tr>`;});
+    html+='</table></body></html>';
+    const w=window.open('','_blank'); w.document.write(html); w.document.close(); w.print();
+  }
+};
+
+app.init();
+
+// ── Timer freeze/resume on tab hide/show ──
+document.addEventListener('visibilitychange', ()=>{
+  if(!app.timerOn) return;
+  if(document.hidden){
+    // Tab hidden — stop the interval and save elapsed time immediately
+    app.stopTimerEngine();
+    app.saveProgress();
+  } else {
+    // Tab visible again — resume from saved seconds
+    app.timerInterval = setInterval(()=>{ app.timerSeconds++; app._tickTimer(); app.saveProgress(); }, 1000);
+  }
+});
+
+// ── Save elapsed time on page close/refresh ──
+window.addEventListener('beforeunload', ()=>{
+  if(app.timerOn) app.saveProgress();
+});
+
+/* ── CONFETTI ── */
+const canvas=document.getElementById('confetti-canvas');
+const ctx=canvas.getContext('2d');
+let particles=[],animationId=null;
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+window.addEventListener('resize',resize);resize();
+function startConfetti(){
+  particles=[];
+  const colors=['#d35400','#f39c12','#2ecc71','#3498db','#e74c3c','#9b59b6'];
+  for(let i=0;i<160;i++) particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height-canvas.height,c:colors[~~(Math.random()*colors.length)],s:Math.random()*5+3,d:Math.random()*5+2,r:Math.random()*Math.PI*2});
+  animate();
+}
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r+=0.05);
+    ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s);
+    ctx.restore(); p.y+=p.d; p.x+=Math.sin(p.r)*1.5;
+    if(p.y>canvas.height){p.y=-10;p.x=Math.random()*canvas.width;}
+  });
+  animationId=requestAnimationFrame(animate);
+}
+function stopConfetti(){
+  if(animationId) cancelAnimationFrame(animationId);
+  ctx.clearRect(0,0,canvas.width,canvas.height); animationId=null;
+}
+</script>
+</body>
+</html>
