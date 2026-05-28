@@ -970,14 +970,16 @@ let isReading = false;
 let activeDirBtn = null;  // tracks which per-section speak button is active
 
 function clearHighlights(){
+  // Only removes the visual .hl class — does NOT reset hlIdx
+  // (hlIdx is reset only in stopReading so onboundary keeps advancing correctly)
   hlSpans.forEach(s=>s && s.classList.remove('hl'));
-  hlIdx = 0;
 }
 
 function stopReading(){
   window.speechSynthesis.cancel();
   isReading = false;
   clearHighlights();
+  hlIdx = 0;   // reset index here, after reading is fully stopped
   const btn = document.getElementById('speak-q-btn');
   if(btn){ btn.innerText='🔊'; btn.title='Read question aloud'; }
   if(activeDirBtn){ activeDirBtn.innerText='🔊'; activeDirBtn = null; }
