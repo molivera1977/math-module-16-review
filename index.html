@@ -106,29 +106,50 @@
     #confirm-btn:hover:not(:disabled) { box-shadow: 0 6px 0 var(--teal-dark); }
 
     /* START / LOGIN */
-    .login-box { max-width: 420px; margin: 0 auto 24px; }
+    .welcome-sub {
+      text-align: center; color: #bbb; font-size: 0.88rem;
+      margin: -14px 0 26px; letter-spacing: 0.5px;
+    }
+    .step-card {
+      background: #fafafa; border: 2px solid #ececec;
+      border-radius: 16px; padding: 22px 24px 16px; margin-bottom: 16px;
+    }
+    .step-label {
+      display: block; font-size: 0.7rem; font-weight: bold;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--primary); margin-bottom: 14px;
+    }
+    #form-select-section { animation: fadeSlideIn 0.35s ease; }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .login-box { max-width: 420px; margin: 0 auto; }
     .login-box label { font-size: 1.05rem; font-weight: bold; color: #555; display: block; margin-bottom: 6px; }
     .login-box select, .login-box input {
       width: 100%; padding: 11px 14px; border-radius: 10px; border: 2px solid #ccc;
       font-size: 1.05rem; font-family: "Comic Sans MS", cursive; margin-bottom: 14px;
     }
     .login-box select:focus, .login-box input:focus { outline: none; border-color: var(--primary); }
-    .login-error { color: #c0392b; font-size: 0.95rem; font-weight: bold; text-align: center; min-height: 22px; margin-bottom: 6px; }
+    .login-error { color: #c0392b; font-size: 0.95rem; font-weight: bold; text-align: center; min-height: 22px; margin-bottom: 4px; }
     .sign-in-btn {
-      width: 100%; padding: 13px; margin-top: 6px; border: none; border-radius: 12px;
+      width: 100%; padding: 13px; margin-top: 4px; border: none; border-radius: 12px;
       background: var(--teal); color: white; font-size: 1.1rem;
       font-family: "Comic Sans MS", cursive; cursor: pointer;
       box-shadow: 0 4px 0 var(--teal-dark); transition: transform 0.1s;
     }
     .sign-in-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--teal-dark); }
-    .start-grid { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .start-grid { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
     .start-btn { background: var(--primary); color: white; padding: 20px 40px; border: none; border-radius: 15px; cursor: pointer; font-size: 1.3rem; font-family: "Comic Sans MS", cursive; box-shadow: 0 5px 0 var(--primary-dark); transition: transform 0.1s; }
     .start-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 0 var(--primary-dark); }
     .score-btn { background: var(--secondary); color: #5a3000; padding: 14px 28px; border: none; border-radius: 15px; cursor: pointer; font-size: 1.15rem; font-family: "Comic Sans MS", cursive; box-shadow: 0 5px 0 #c49f0a; transition: transform 0.1s; margin-top: 10px; }
     .score-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #c49f0a; }
 
     /* RESUME */
-    #resume-container { margin-bottom: 20px; text-align: center; }
+    #resume-container {
+      background: #fff8f0; border: 2px solid #f0c080;
+      border-radius: 16px; padding: 20px 24px; margin-bottom: 16px; text-align: center;
+    }
     .resume-btn { background: #e67e22; color: white; padding: 14px 28px; border: none; border-radius: 15px; cursor: pointer; font-size: 1.15rem; font-family: "Comic Sans MS", cursive; box-shadow: 0 5px 0 #a85813; transition: transform 0.1s; }
     .resume-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #a85813; }
 
@@ -186,61 +207,71 @@
 <canvas id="confetti-canvas"></canvas>
 
 <div class="container">
-  <h1>✖️ Math Module 16 Review</h1>
+  <h1>🔢 Math Module 16 Review</h1>
+  <p class="welcome-sub">Multiplying Fractions</p>
 
   <!-- START SCREEN -->
   <div id="start-screen">
 
     <!-- RESUME CARD -->
     <div id="resume-container" class="hidden">
-      <p style="margin-bottom:8px;font-weight:bold;color:#555;">Welcome back! You have an unfinished test.</p>
+      <p style="margin:0 0 12px;font-weight:bold;color:#a04000;font-size:1.05rem;">↩️ Welcome back! You have an unfinished test.</p>
       <button class="resume-btn" onclick="app.resumeTest()">↩️ Resume My Test</button>
-      <div style="margin-top:10px;">
+      <div style="margin-top:12px;">
         <button onclick="app.discardProgress()"
-          style="background:none;border:none;color:#c0392b;font-size:0.88rem;cursor:pointer;
+          style="background:none;border:none;color:#c0392b;font-size:0.85rem;cursor:pointer;
                  font-family:'Comic Sans MS',cursive;text-decoration:underline;padding:4px;">
-          🗑️ Discard progress &amp; start over (Teacher PIN required)
+          🗑️ Discard &amp; start over (Teacher PIN required)
         </button>
       </div>
-      <hr style="margin:18px 0;opacity:0.3;">
     </div>
 
     <!-- STUDENT LOGIN -->
     <div id="student-login-panel">
-      <div class="login-box">
 
-        <!-- STEP 1: Name dropdown -->
-        <label for="name-select">👤 Select your name:</label>
-        <select id="name-select" onchange="app.onNameSelect()">
-          <option value="">-- Choose your name --</option>
-        </select>
+      <!-- STEP 1 — SIGN IN -->
+      <div class="step-card">
+        <span class="step-label">Step 1 — Sign In</span>
+        <div class="login-box">
 
-        <!-- STEP 2: PIN — hidden until name chosen -->
-        <div id="pin-section" class="hidden">
-          <label for="student-pin" id="pin-label">🔒 Enter your student number:</label>
-          <input type="password" id="student-pin" placeholder="Student number..."
-                 onkeydown="if(event.key==='Enter') app.attemptLogin()" autocomplete="off" />
-          <!-- Guest name field — only shown for guest slots -->
-          <div id="guest-name-section" class="hidden">
-            <label for="guest-display-name">✏️ Enter your first name:</label>
-            <input type="text" id="guest-display-name" placeholder="e.g. Henry" maxlength="20"
-                   onkeydown="if(event.key==='Enter') app.attemptLogin()" />
+          <label for="name-select">👤 Select your name:</label>
+          <select id="name-select" onchange="app.onNameSelect()">
+            <option value="">-- Choose your name --</option>
+          </select>
+
+          <!-- PIN — hidden until name chosen -->
+          <div id="pin-section" class="hidden">
+            <label for="student-pin" id="pin-label">🔒 Enter your student number:</label>
+            <input type="password" id="student-pin" placeholder="Student number..."
+                   onkeydown="if(event.key==='Enter') app.attemptLogin()" autocomplete="off" />
+            <!-- Guest name field — only shown for guest slots -->
+            <div id="guest-name-section" class="hidden">
+              <label for="guest-display-name">✏️ Enter your first name:</label>
+              <input type="text" id="guest-display-name" placeholder="e.g. Henry" maxlength="20"
+                     onkeydown="if(event.key==='Enter') app.attemptLogin()" />
+            </div>
+            <button class="sign-in-btn" onclick="app.attemptLogin()">✅ Sign In</button>
           </div>
-          <button class="sign-in-btn" onclick="app.attemptLogin()">✅ Sign In</button>
+
+          <div class="login-error" id="login-error"></div>
         </div>
-
-        <div class="login-error" id="login-error"></div>
       </div>
 
-      <p style="text-align:center;font-size:1.15rem;margin:20px 0 14px;">Select a review form:</p>
-      <div class="start-grid">
-        <button class="start-btn" id="form-a-btn" onclick="app.attemptLogin('A')" disabled style="opacity:0.4;">📝 Form A</button>
-        <button class="start-btn" id="form-b-btn" onclick="app.attemptLogin('B')" disabled style="opacity:0.4;">📝 Form B</button>
-        <button class="start-btn" id="form-c-btn" onclick="app.attemptLogin('C')" disabled style="opacity:0.4;">📝 Form C</button>
+      <!-- STEP 2 — CHOOSE A FORM (hidden until logged in) -->
+      <div id="form-select-section" class="hidden">
+        <div class="step-card">
+          <span class="step-label">Step 2 — Choose a Form</span>
+          <div class="start-grid">
+            <button class="start-btn" id="form-a-btn" onclick="app.attemptLogin('A')" disabled style="opacity:0.4;">📝 Form A</button>
+            <button class="start-btn" id="form-b-btn" onclick="app.attemptLogin('B')" disabled style="opacity:0.4;">📝 Form B</button>
+            <button class="start-btn" id="form-c-btn" onclick="app.attemptLogin('C')" disabled style="opacity:0.4;">📝 Form C</button>
+          </div>
+        </div>
+        <div id="scores-btn-wrap" style="text-align:center; margin-bottom: 8px;">
+          <button class="score-btn" onclick="app.showScores()">📊 View Score History</button>
+        </div>
       </div>
-      <div id="scores-btn-wrap" class="hidden" style="text-align:center;">
-        <button class="score-btn" onclick="app.showScores()">📊 View Score History</button>
-      </div>
+
     </div>
 
   </div>
@@ -985,7 +1016,7 @@ const app = {
         btn.onclick = () => app.attemptLogin(form);
       });
       document.getElementById('resume-container').classList.add('hidden');
-      document.getElementById('scores-btn-wrap').classList.add('hidden');
+      document.getElementById('form-select-section').classList.add('hidden');
     }
 
     if(!val){
@@ -1072,8 +1103,8 @@ const app = {
     // Show Resume button only if this student has an unfinished session
     this.checkSavedProgress(loggedInName);
 
-    // Reveal Score History button now that someone is logged in
-    document.getElementById('scores-btn-wrap').classList.remove('hidden');
+    // Reveal Step 2 (form selection + score history) now that someone is logged in
+    document.getElementById('form-select-section').classList.remove('hidden');
 
     if(formOverride) this.startTest(formOverride, loggedInName);
   },
@@ -1327,7 +1358,7 @@ const app = {
     this.selectedAnswer = null;
     unlockedForms = new Set();
     document.getElementById('resume-container').classList.add('hidden');
-    document.getElementById('scores-btn-wrap').classList.add('hidden');
+    document.getElementById('form-select-section').classList.add('hidden');
     // Restore form buttons to their base state (content + handler)
     ['A','B','C'].forEach(form => {
       const btn = document.getElementById(`form-${form.toLowerCase()}-btn`);
