@@ -49,7 +49,7 @@
       font-size: 0.95rem; font-weight: bold; color: #856404;
     }
     .reading-timer-fill-wrap { flex: 1; height: 8px; background: #ffe69c; border-radius: 4px; overflow: hidden; }
-    .reading-timer-fill { height: 100%; background: #d35400; width: 0%; transition: width 0.1s linear; border-radius: 4px; }
+    .reading-timer-fill { height: 100%; background: #d35400; width: 0%; border-radius: 4px; }
     .reading-timer-count { min-width: 28px; text-align: right; font-size: 1rem; }
 
     /* NEXT TIMER (10s soak) */
@@ -59,7 +59,7 @@
       font-size: 0.95rem; font-weight: bold; color: #0c5460;
     }
     .next-timer-fill-wrap { flex: 1; height: 8px; background: #bee5eb; border-radius: 4px; overflow: hidden; }
-    .next-timer-fill { height: 100%; background: #17a2b8; width: 100%; transition: width 0.1s linear; border-radius: 4px; }
+    .next-timer-fill { height: 100%; background: #17a2b8; width: 100%; border-radius: 4px; }
 
     /* PROGRESS */
     .progress-bar { height: 12px; background: #e9ecef; border-radius: 6px; margin-bottom: 10px; overflow: hidden; }
@@ -1041,8 +1041,15 @@ function startReadingTimer(){
   const fill = document.getElementById('reading-fill');
   const count = document.getElementById('reading-count');
   bar.style.display = 'flex';
-  fill.style.width = '0%';
   count.innerText = readingSeconds;
+
+  // Reset bar instantly, then let CSS glide it to 100% over the full duration
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    fill.style.transition = `width ${READING_LOCK_SECS}s linear`;
+    fill.style.width = '100%';
+  }));
 
   // Lock all answer buttons
   document.querySelectorAll('.answer-btn').forEach(b=>{
@@ -1050,15 +1057,14 @@ function startReadingTimer(){
     b.classList.add('locked-choice');
   });
 
+  // Interval only updates the countdown number and fires the unlock
   readingInterval = setInterval(()=>{
     readingSeconds--;
     count.innerText = Math.max(0, readingSeconds);
-    fill.style.width = `${((READING_LOCK_SECS - readingSeconds) / READING_LOCK_SECS) * 100}%`;
     if(readingSeconds <= 0){
       clearInterval(readingInterval);
       readingUnlocked = true;
       bar.style.display = 'none';
-      // Unlock answer buttons
       document.querySelectorAll('.answer-btn').forEach(b=>{
         b.disabled = false;
         b.classList.remove('locked-choice');
@@ -1074,13 +1080,20 @@ function startNextTimer(callback){
   const fill = document.getElementById('next-fill');
   const count = document.getElementById('next-count');
   bar.classList.remove('hidden');
-  fill.style.width = '100%';
   count.innerText = nextSeconds;
 
+  // Reset bar to full instantly, then let CSS drain it to 0% over the full duration
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    fill.style.transition = `width ${SOAK_SECS}s linear`;
+    fill.style.width = '0%';
+  }));
+
+  // Interval only updates the countdown number and fires the Next button
   nextInterval = setInterval(()=>{
     nextSeconds--;
     count.innerText = Math.max(0, nextSeconds);
-    fill.style.width = `${(nextSeconds / SOAK_SECS) * 100}%`;
     if(nextSeconds <= 0){
       clearInterval(nextInterval);
       bar.classList.add('hidden');
