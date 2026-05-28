@@ -190,6 +190,53 @@
     .start-btn.form-btn-locked:hover { background: #95a5a6 !important; box-shadow: 0 8px 0 #7f8c8d !important; }
     .form-btn-sub { font-size: 0.65em; display: block; font-weight: normal; opacity: 0.9; margin-top: 3px; }
 
+    /* WELCOME PANEL */
+    #welcome-panel { text-align: center; padding: 10px 0 24px; }
+    .welcome-hero {
+      font-size: 1.05rem; color: #777; margin: 0 auto 28px;
+      max-width: 400px; line-height: 1.8;
+    }
+    .lgs-btn {
+      background: var(--primary); color: white; border: none;
+      padding: 18px 52px; border-radius: 16px; font-size: 1.3rem;
+      font-family: "Comic Sans MS", cursive; cursor: pointer;
+      box-shadow: 0 5px 0 var(--primary-dark); transition: transform 0.1s;
+    }
+    .lgs-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 0 var(--primary-dark); }
+
+    /* DIRECTIONS SCREEN */
+    .dir-section {
+      border-radius: 14px; padding: 16px 18px; margin-bottom: 14px;
+      border: 2px solid transparent;
+    }
+    .dir-section h3 { margin: 0 0 7px; font-size: 1.05rem; }
+    .dir-section p  { margin: 0; font-size: 0.95rem; line-height: 1.65; color: #444; }
+    .dir-section.login-dir   { background: #eafaf1; border-color: #a9dfbf; }
+    .dir-section.login-dir h3 { color: #1e8449; }
+    .dir-section.form-dir    { background: #eaf2ff; border-color: #a9c4f5; }
+    .dir-section.form-dir h3  { color: #2471a3; }
+    .dir-section.read-dir    { background: #fff8e7; border-color: #ffc107; }
+    .dir-section.read-dir h3  { color: #856404; }
+    .dir-section.soak-dir    { background: #e8f8f8; border-color: #76d7c4; }
+    .dir-section.soak-dir h3  { color: #0e6655; }
+    .dir-section.timer-dir   { background: #1e2d3d; border-color: #2ecc71; }
+    .dir-section.timer-dir h3 { color: #2ecc71; font-family: monospace; letter-spacing: 1px; }
+    .dir-section.timer-dir p  { color: #aac; }
+    .timer-chip {
+      display: inline-block; border-radius: 20px; padding: 3px 14px;
+      font-size: 0.82rem; font-weight: bold; margin-top: 8px;
+    }
+    .chip-amber  { background: #fff3cd; border: 2px solid #ffc107; color: #856404; }
+    .chip-teal   { background: #d1ecf1; border: 2px solid #17a2b8; color: #0c5460; }
+    .chip-green  { background: #1e2d3d; border: 2px solid #2ecc71; color: #2ecc71; font-family: monospace; }
+    .ready-btn {
+      width: 100%; padding: 16px; border: none; border-radius: 14px;
+      background: var(--teal); color: white; font-size: 1.2rem;
+      font-family: "Comic Sans MS", cursive; cursor: pointer;
+      box-shadow: 0 5px 0 var(--teal-dark); transition: transform 0.1s; margin-top: 8px;
+    }
+    .ready-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--teal-dark); }
+
     /* GLOBAL PIN MODAL */
     #pin-modal { display: flex; align-items: center; justify-content: center;
                  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -213,21 +260,30 @@
   <!-- START SCREEN -->
   <div id="start-screen">
 
-    <!-- RESUME CARD -->
-    <div id="resume-container" class="hidden">
-      <p style="margin:0 0 12px;font-weight:bold;color:#a04000;font-size:1.05rem;">↩️ Welcome back! You have an unfinished test.</p>
-      <button class="resume-btn" onclick="app.resumeTest()">↩️ Resume My Test</button>
-      <div style="margin-top:12px;">
-        <button onclick="app.discardProgress()"
-          style="background:none;border:none;color:#c0392b;font-size:0.85rem;cursor:pointer;
-                 font-family:'Comic Sans MS',cursive;text-decoration:underline;padding:4px;">
-          🗑️ Discard &amp; start over (Teacher PIN required)
-        </button>
-      </div>
+    <!-- WELCOME PANEL (shown on first load) -->
+    <div id="welcome-panel">
+      <p class="welcome-hero">
+        Practice multiplying fractions with real problems.<br>
+        You'll get instant feedback on every question!
+      </p>
+      <button class="lgs-btn" onclick="app.showDirections()">🚀 Let's Get Started!</button>
     </div>
 
-    <!-- STUDENT LOGIN -->
-    <div id="student-login-panel">
+    <!-- STUDENT LOGIN (hidden until after directions) -->
+    <div id="student-login-panel" class="hidden">
+
+      <!-- RESUME CARD -->
+      <div id="resume-container" class="hidden">
+        <p style="margin:0 0 12px;font-weight:bold;color:#a04000;font-size:1.05rem;">↩️ Welcome back! You have an unfinished test.</p>
+        <button class="resume-btn" onclick="app.resumeTest()">↩️ Resume My Test</button>
+        <div style="margin-top:12px;">
+          <button onclick="app.discardProgress()"
+            style="background:none;border:none;color:#c0392b;font-size:0.85rem;cursor:pointer;
+                   font-family:'Comic Sans MS',cursive;text-decoration:underline;padding:4px;">
+            🗑️ Discard &amp; start over (Teacher PIN required)
+          </button>
+        </div>
+      </div>
 
       <!-- STEP 1 — SIGN IN -->
       <div class="step-card">
@@ -274,6 +330,41 @@
 
     </div>
 
+  </div>
+
+  <!-- DIRECTIONS SCREEN -->
+  <div id="directions-screen" class="hidden">
+    <h2 style="text-align:center;color:var(--primary);margin-top:0;margin-bottom:20px;">📋 How It Works</h2>
+
+    <div class="dir-section login-dir">
+      <h3>👤 Step 1 — Sign In</h3>
+      <p>Choose your name from the dropdown, then enter your <strong>student number</strong> and tap <strong>Sign In</strong>. Guest students will also enter their first name.</p>
+    </div>
+
+    <div class="dir-section form-dir">
+      <h3>📝 Step 2 — Pick a Form</h3>
+      <p>There are <strong>3 forms</strong> (A, B, and C), each with <strong>17 questions</strong>. Once you finish a form it locks — your teacher must unlock it if you want to try again.</p>
+    </div>
+
+    <div class="dir-section read-dir">
+      <h3>📖 Reading Timer</h3>
+      <p>When a question appears, the answer buttons are <strong>locked for 12 seconds</strong>. Use that time to read the question carefully before the answers open up.</p>
+      <span class="timer-chip chip-amber">⏱️ 12 second read lock</span>
+    </div>
+
+    <div class="dir-section soak-dir">
+      <h3>⏳ Thinking Timer</h3>
+      <p>After you confirm your answer you'll wait <strong>8 seconds</strong> before moving on. This gives your brain time to process the result — right or wrong!</p>
+      <span class="timer-chip chip-teal">⏳ 8 second pause</span>
+    </div>
+
+    <div class="dir-section timer-dir">
+      <h3>⏱ OVERALL TIMER</h3>
+      <p>A timer runs the whole time you're taking the review. It is <strong>not a countdown</strong> — there is no time limit. It only measures how long you take for your teacher's records.</p>
+      <span class="timer-chip chip-green">📊 No pressure — no time limit!</span>
+    </div>
+
+    <button class="ready-btn" onclick="app.showLogin()">✅ Got It — Let's Begin!</button>
   </div>
 
   <!-- QUIZ SCREEN -->
@@ -989,8 +1080,22 @@ const app = {
   timerSeconds:0, timerInterval:null, studentName:"",
 
   init(){
-    // Resume container is always hidden at page load — only revealed after login
+    // Resume container always hidden at page load — only shown after login if needed
     document.getElementById('resume-container').classList.add('hidden');
+  },
+
+  /* ── Welcome → Directions ── */
+  showDirections(){
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('directions-screen').classList.remove('hidden');
+  },
+
+  /* ── Directions → Sign-in ── */
+  showLogin(){
+    document.getElementById('directions-screen').classList.add('hidden');
+    document.getElementById('welcome-panel').classList.add('hidden');
+    document.getElementById('student-login-panel').classList.remove('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
   },
 
   /* ── Name dropdown changed → reveal PIN field, adjust label ── */
@@ -1328,8 +1433,11 @@ const app = {
   restart(){
     stopConfetti(); this.stopTimerEngine();
     clearInterval(readingInterval); clearInterval(nextInterval);
-    ['end-screen','scoreboard-screen','quiz-screen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+    ['end-screen','scoreboard-screen','quiz-screen','directions-screen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
     document.getElementById('start-screen').classList.remove('hidden');
+    // After a test, go straight to sign-in — skip the welcome panel
+    document.getElementById('welcome-panel').classList.add('hidden');
+    document.getElementById('student-login-panel').classList.remove('hidden');
     // Reset login UI
     document.getElementById('name-select').value = '';
     document.getElementById('student-pin').value = '';
