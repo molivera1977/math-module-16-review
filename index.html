@@ -460,6 +460,8 @@ function buildSubmission(done){
     score:         app.score,
     total:         app.currentTest.length,
     percent:       pct,
+    maxScore:      17,
+    minSecs:       180,
     status:        done ? 'Complete' : `In Progress (Q${app.currentIndex + 1}/${app.currentTest.length})`,
     done,
     elapsed,
