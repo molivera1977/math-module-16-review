@@ -334,40 +334,49 @@
 
   <!-- DIRECTIONS SCREEN -->
   <div id="directions-screen" class="hidden">
-    <h2 style="text-align:center;color:var(--primary);margin-top:0;margin-bottom:14px;">📋 How It Works</h2>
-
-    <div style="text-align:center;margin-bottom:20px;">
-      <button id="speak-dir-btn" class="speak-btn" onclick="app.speakDirections()"
-              style="border-radius:30px;padding:8px 22px;font-size:1rem;min-width:unset;width:auto;">
-        🔊 Read Aloud
-      </button>
-    </div>
+    <h2 style="text-align:center;color:var(--primary);margin-top:0;margin-bottom:20px;">📋 How It Works</h2>
 
     <div class="dir-section login-dir">
-      <h3>👤 Step 1 — Sign In</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+        <h3 style="margin:0;">👤 Step 1 — Sign In</h3>
+        <button class="speak-btn" onclick="speakDirSection(this)" title="Read aloud">🔊</button>
+      </div>
       <p class="dir-text">Choose your name from the dropdown, then enter your student number and tap Sign In. Guest students will also enter their first name.</p>
     </div>
 
     <div class="dir-section form-dir">
-      <h3>📝 Step 2 — Pick a Form</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+        <h3 style="margin:0;">📝 Step 2 — Pick a Form</h3>
+        <button class="speak-btn" onclick="speakDirSection(this)" title="Read aloud">🔊</button>
+      </div>
       <p class="dir-text">There are 3 forms to choose from — Form A, Form B, and Form C — each with 17 questions. Once you finish a form it locks. Your teacher must unlock it if you want to try again.</p>
     </div>
 
     <div class="dir-section read-dir">
-      <h3>📖 Reading Timer</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+        <h3 style="margin:0;">📖 Reading Timer</h3>
+        <button class="speak-btn" onclick="speakDirSection(this)" title="Read aloud">🔊</button>
+      </div>
       <p class="dir-text">When a question appears, the answer buttons are locked for 12 seconds. Use that time to read the question carefully before the answers open up.</p>
       <span class="timer-chip chip-amber">⏱️ 12 second read lock</span>
     </div>
 
     <div class="dir-section soak-dir">
-      <h3>⏳ Thinking Timer</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+        <h3 style="margin:0;">⏳ Thinking Timer</h3>
+        <button class="speak-btn" onclick="speakDirSection(this)" title="Read aloud">🔊</button>
+      </div>
       <p class="dir-text">After you confirm your answer you will wait 8 seconds before moving on. This gives your brain time to process the result — right or wrong!</p>
       <span class="timer-chip chip-teal">⏳ 8 second pause</span>
     </div>
 
     <div class="dir-section timer-dir">
-      <h3>⏱ Overall Timer</h3>
-      <p class="dir-text">A timer runs the whole time you are taking the review. It is not a countdown — there is no time limit. It only measures how long you take for your teacher's records.</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+        <h3 style="margin:0;">⏱ Overall Timer</h3>
+        <button class="speak-btn" onclick="speakDirSection(this)" title="Read aloud"
+                style="border-color:#2ecc71;color:#2ecc71;">🔊</button>
+      </div>
+      <p class="dir-text">A timer runs the whole time you are taking the review. It is not a countdown — there is no time limit. It only measures how long you take for your teacher records.</p>
       <span class="timer-chip chip-green">📊 No pressure — no time limit!</span>
     </div>
 
@@ -958,7 +967,7 @@ const tests = {
 let hlSpans = [];
 let hlIdx = 0;
 let isReading = false;
-let dirSpans = [];   // flat array of .wrd spans across all direction paragraphs
+let activeDirBtn = null;  // tracks which per-section speak button is active
 
 function clearHighlights(){
   hlSpans.forEach(s=>s && s.classList.remove('hl'));
@@ -971,22 +980,42 @@ function stopReading(){
   clearHighlights();
   const btn = document.getElementById('speak-q-btn');
   if(btn){ btn.innerText='🔊'; btn.title='Read question aloud'; }
-  const dirBtn = document.getElementById('speak-dir-btn');
-  if(dirBtn){ dirBtn.innerText='🔊 Read Aloud'; }
+  if(activeDirBtn){ activeDirBtn.innerText='🔊'; activeDirBtn = null; }
 }
 
-// Wrap every word in every .dir-text paragraph in a .wrd span
-// Called each time the directions screen opens; idempotent via textContent
-function wrapDirectionsWords(){
-  dirSpans = [];
-  let idx = 0;
-  document.querySelectorAll('#directions-screen .dir-text').forEach(el => {
-    const words = el.textContent.trim().split(/\s+/).filter(w => w);
-    el.innerHTML = words.map(w =>
-      `<span class="wrd" id="dir-wrd-${idx++}">${w}</span>`
-    ).join(' ');
-  });
-  dirSpans = Array.from(document.querySelectorAll('#directions-screen .dir-text .wrd'));
+// Read aloud a single directions section paragraph with word-by-word highlight
+// Called by onclick="speakDirSection(this)" on each section's speak button
+function speakDirSection(btn){
+  // Toggle off if already reading
+  if(isReading){ stopReading(); return; }
+
+  const section = btn.closest('.dir-section');
+  const p = section ? section.querySelector('.dir-text') : null;
+  if(!p) return;
+
+  // Wrap paragraph words in .wrd spans (idempotent — textContent strips old spans)
+  const words = p.textContent.trim().split(/\s+/).filter(w => w);
+  p.innerHTML = words.map((w, i) => `<span class="wrd" id="dsec-wrd-${i}">${w}</span>`).join(' ');
+
+  btn.innerText = '🔇';
+  activeDirBtn  = btn;
+  hlSpans  = Array.from(p.querySelectorAll('.wrd'));
+  hlIdx    = 0;
+  isReading = true;
+
+  const utt  = new SpeechSynthesisUtterance(words.join(' '));
+  utt.rate   = 0.9;
+  utt.onboundary = e => {
+    if(e.name !== 'word') return;
+    clearHighlights();
+    if(hlSpans[hlIdx]) hlSpans[hlIdx].classList.add('hl');
+    hlIdx++;
+  };
+  utt.onend   = () => { stopReading(); };
+  utt.onerror = () => { stopReading(); };
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
 }
 
 /* ══════════════════════════════════════════
@@ -1112,47 +1141,11 @@ const app = {
     stopReading();
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('directions-screen').classList.remove('hidden');
-    wrapDirectionsWords();
-  },
-
-  /* ── Read the directions aloud with word-by-word highlight ── */
-  speakDirections(){
-    const btn = document.getElementById('speak-dir-btn');
-    if(isReading){ stopReading(); return; }
-
-    btn.innerText = '🔇 Stop';
-
-    // Build spoken text: section heading + body, joined naturally
-    const fullText = Array.from(document.querySelectorAll('#directions-screen .dir-section'))
-      .map(sec => {
-        // Strip leading emoji from heading for cleaner TTS
-        const heading = (sec.querySelector('h3') || {}).textContent || '';
-        const body    = (sec.querySelector('.dir-text') || {}).textContent || '';
-        return [heading.replace(/^\S+\s*/, '').trim(), body.trim()].filter(t=>t).join('. ');
-      })
-      .join('. ');
-
-    hlSpans = dirSpans;
-    hlIdx   = 0;
-    isReading = true;
-
-    const utt  = new SpeechSynthesisUtterance(fullText);
-    utt.rate   = 0.9;
-    utt.onboundary = e => {
-      if(e.name !== 'word') return;
-      clearHighlights();
-      if(hlSpans[hlIdx]) hlSpans[hlIdx].classList.add('hl');
-      hlIdx++;
-    };
-    utt.onend   = () => { stopReading(); };
-    utt.onerror = () => { stopReading(); };
-
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utt);
   },
 
   /* ── Directions → Sign-in ── */
   showLogin(){
+    stopReading();   // stop any section that's still reading
     document.getElementById('directions-screen').classList.add('hidden');
     document.getElementById('welcome-panel').classList.add('hidden');
     document.getElementById('student-login-panel').classList.remove('hidden');
