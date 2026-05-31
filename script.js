@@ -29,7 +29,7 @@ function submitScorePartial() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       action:    'submit',
-      game:      'mod16review',
+      game:      'mod16_' + (app.currentForm || '?').toLowerCase(),
       sessionId: SESSION_ID + '-' + (app.currentForm || 'x'),
       name:      app.studentName || 'Unknown',
       form:      'Form ' + (app.currentForm || '?'),
@@ -53,7 +53,7 @@ function submitScoreFinal() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       action:    'submit',
-      game:      'mod16review',
+      game:      'mod16_' + (app.currentForm || '?').toLowerCase(),
       sessionId: SESSION_ID + '-' + (app.currentForm || 'x') + '-A' + (app.currentAttemptNum || 1),
       name:      app.studentName || 'Unknown',
       form:      'Form ' + (app.currentForm || '?'),
