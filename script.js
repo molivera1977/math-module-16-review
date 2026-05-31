@@ -862,7 +862,7 @@ const app = {
       wrap.appendChild(row);
     });
 
-    if (!reviewMode && this.currentIndex > 0 && this.currentIndex % 5 === 0) submitScorePartial();
+    if (this.currentIndex > 0 && this.currentIndex % 5 === 0) submitScorePartial();
     this.saveProgress();
     this.startReadTimer();
   },
@@ -960,7 +960,7 @@ const app = {
       localStorage.setItem(SCORES_KEY, JSON.stringify(scores));
     }
 
-    if (!reviewMode) submitScoreFinal();
+    submitScoreFinal();
 
     let letter = 'F', msg = "Let's practice more! 📚";
     if (pct >= 90) { letter = 'A'; msg = "Outstanding Work! 🌟"; }
