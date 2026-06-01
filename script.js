@@ -918,7 +918,7 @@ const app = {
     // Feedback read-aloud button
     const fbSpeakBtn = document.createElement('button');
     fbSpeakBtn.className = 'speak-btn';
-    fbSpeakBtn.style.cssText = 'float:right;margin:-2px 0 6px 10px;';
+    fbSpeakBtn.style.cssText = 'float:left;margin:0 10px 4px 0;';
     fbSpeakBtn.textContent = '🔊';
     const spokenFb = convertToSpokenText(correct
       ? `Correct! ${q.explanation || ''}`
