@@ -783,7 +783,7 @@ const app = {
     const total = this.currentBank.length;
 
     document.getElementById('progress-text').textContent = `Question ${this.currentIndex + 1} of ${total}`;
-    document.getElementById('score-text').textContent    = `Score: ${this.score}`;
+    document.getElementById('score-text').textContent    = `${getFirstName(this.studentName)} · ${this.score}`;
     document.getElementById('progress-fill').style.width = `${(this.currentIndex / total) * 100}%`;
 
     this._renderStreak();
@@ -896,7 +896,7 @@ const app = {
       this.streak++;
     } else {
       this.streak = 0;
-      this.missedQuestions.push({ id: q.id, q: q.q, yourAnswer: this.selectedAnswer, correct: q.answer });
+      this.missedQuestions.push({ id: q.id, q: q.q, yourAnswer: this.selectedAnswer, correct: q.answer, explanation: q.explanation || '' });
     }
 
     document.querySelectorAll('.answer-btn').forEach(btn => {
@@ -912,8 +912,27 @@ const app = {
       ? `✅ <strong>Correct!</strong><br>${formatMathText(q.explanation)}`
       : `❌ <strong>Not quite.</strong> The correct answer is: <strong>${formatMathText(q.answer)}</strong><br>${formatMathText(q.explanation)}`;
 
+    // Feedback read-aloud button
+    const fbSpeakBtn = document.createElement('button');
+    fbSpeakBtn.className = 'speak-btn';
+    fbSpeakBtn.style.cssText = 'float:right;margin:-2px 0 6px 10px;';
+    fbSpeakBtn.textContent = '🔊';
+    const spokenFb = convertToSpokenText(correct
+      ? `Correct! ${q.explanation || ''}`
+      : `Not quite. The correct answer is ${q.answer}. ${q.explanation || ''}`);
+    fbSpeakBtn.onclick = () => {
+      if (activeSpeakBtn === fbSpeakBtn) { stopActiveSpeech(); return; }
+      stopActiveSpeech();
+      activeSpeakBtn = fbSpeakBtn; fbSpeakBtn.textContent = '⏹';
+      const u = new SpeechSynthesisUtterance(spokenFb);
+      u.lang = 'en-US'; u.rate = 0.9;
+      u.onend = () => { fbSpeakBtn.textContent = '🔊'; if (activeSpeakBtn === fbSpeakBtn) activeSpeakBtn = null; };
+      window.speechSynthesis.speak(u);
+    };
+    fb.prepend(fbSpeakBtn);
+
     document.getElementById('confirm-btn').classList.add('hidden');
-    document.getElementById('score-text').textContent = `Score: ${this.score}`;
+    document.getElementById('score-text').textContent = `${getFirstName(this.studentName)} · ${this.score}`;
     this._renderStreak();
     this.saveProgress();
     this.startNextTimer();
@@ -963,7 +982,8 @@ const app = {
     submitScoreFinal();
 
     let letter = 'F', msg = "Let's practice more! 📚";
-    if (pct >= 90) { letter = 'A'; msg = "Outstanding Work! 🌟"; }
+    if (pct === 100) { letter = 'A+'; msg = "⭐ PERFECT SCORE! ⭐"; }
+    else if (pct >= 90) { letter = 'A'; msg = "Outstanding Work! 🌟"; }
     else if (pct >= 80) { letter = 'B'; msg = "Great Job! 👏"; }
     else if (pct >= 70) { letter = 'C'; msg = "Good Effort! 💪"; }
     else if (pct >= 60) { letter = 'D'; msg = "Keep Practicing! 🔄"; }
@@ -990,13 +1010,14 @@ const app = {
             <div class="mi-label">${m.id}</div>
             <div style="margin:3px 0;">${formatMathText(m.q)}</div>
             <div>Your answer: <span style="color:var(--danger);">${formatMathText(m.yourAnswer)}</span> &nbsp; ✅ Correct: <strong style="color:var(--correct);">${formatMathText(m.correct)}</strong></div>
+            ${m.explanation ? `<div style="margin-top:5px;font-size:0.85rem;color:#555;font-style:italic;">💡 ${formatMathText(m.explanation)}</div>` : ''}
           </div>`
         ).join('');
     } else {
       missedSec.classList.add('hidden');
     }
 
-    if (pct >= 70) startConfetti();
+    if (pct >= 70) startConfetti(pct);
 
     if (!reviewMode && allFormsCompletedOnce(this.studentName)) {
       setTimeout(() => this.showScores(true), 3000);
@@ -1281,6 +1302,8 @@ document.addEventListener('visibilitychange', () => {
     if (app.instructInterval) { clearInterval(app.instructInterval); }
     if (app.readInterval)     { clearInterval(app.readInterval); }
   } else {
+    const warnBanner = document.getElementById('tab-warning-banner');
+    if (warnBanner) warnBanner.classList.remove('hidden');
     app.timerInterval = setInterval(() => {
       app.timerSeconds++;
       app._tickTimer();
@@ -1302,10 +1325,23 @@ let particles = [], animId = null;
 function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 window.addEventListener('resize', resize); resize();
 
-function startConfetti() {
+function startConfetti(pct) {
   particles = [];
-  const cols = ['#d35400','#f39c12','#2ecc71','#3498db','#e74c3c','#9b59b6'];
-  for (let i = 0; i < 160; i++) {
+  let count, cols;
+  if (pct === 100) {
+    count = 300;
+    cols = ['#FFD700','#FFA500','#FFFACD','#f39c12','#ffffff','#FFD700'];
+  } else if (pct >= 90) {
+    count = 220;
+    cols = ['#d35400','#f39c12','#2ecc71','#3498db','#9b59b6','#e74c3c','#FFD700'];
+  } else if (pct >= 80) {
+    count = 160;
+    cols = ['#d35400','#f39c12','#2ecc71','#3498db','#e74c3c','#9b59b6'];
+  } else {
+    count = 80;
+    cols = ['#d35400','#f39c12','#7f8c8d','#95a5a6','#bdc3c7'];
+  }
+  for (let i = 0; i < count; i++) {
     particles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height - canvas.height,
