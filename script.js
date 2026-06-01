@@ -464,6 +464,7 @@ const app = {
 
   /* ── ATTEMPT START ── */
   attemptStart(form) {
+    if (!this.studentName) return;
     const attempts = getFormAttempts(this.studentName);
     const done     = attempts[form];
     const allDone1 = allFormsCompletedOnce(this.studentName);
@@ -531,6 +532,8 @@ const app = {
   startSession(form) {
     localStorage.removeItem(STORAGE_KEY);
     tabSwitchCount     = 0;
+    const warnBanner = document.getElementById('tab-warning-banner');
+    if (warnBanner) warnBanner.classList.add('hidden');
     this.currentForm   = form;
     this.score         = 0;
     this.streak        = 0;
