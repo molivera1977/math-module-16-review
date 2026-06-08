@@ -14,7 +14,12 @@ const READ_SECS     = 12;
 const NEXT_SECS     = 8;
 const STORAGE_KEY   = 'mod16_session_v1';
 const SCORES_KEY    = 'mod16_scores_v1';
-const SESSION_ID    = 'M16-' + Math.random().toString(36).slice(2, 9).toUpperCase();
+const MOD16_SESSION_ID_KEY = 'mod16_session_id_v1';
+const SESSION_ID = (() => {
+  let id = localStorage.getItem(MOD16_SESSION_ID_KEY);
+  if (!id) { id = 'M16-' + Math.random().toString(36).slice(2, 9).toUpperCase(); localStorage.setItem(MOD16_SESSION_ID_KEY, id); }
+  return id;
+})();
 
 /* ── SHEET SUBMISSION ───────────────────────────────── */
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzv8CWv1yyi8NeH04now9UxVL4IZm5yMqqsEGMcgGdrcAOWVB-aSp5siTvSSJXIUpzFMA/exec';
@@ -531,6 +536,7 @@ const app = {
   /* ── START SESSION ── */
   startSession(form) {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(MOD16_SESSION_ID_KEY);
     tabSwitchCount     = 0;
     const warnBanner = document.getElementById('tab-warning-banner');
     if (warnBanner) warnBanner.classList.add('hidden');
@@ -956,6 +962,7 @@ const app = {
   _finishSession() {
     this.stopTimerEngine();
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(MOD16_SESSION_ID_KEY);
 
     const total = this.currentBank.length;
     const pct   = Math.round((this.score / total) * 100);
@@ -1307,6 +1314,7 @@ document.addEventListener('visibilitychange', () => {
   } else {
     const warnBanner = document.getElementById('tab-warning-banner');
     if (warnBanner) warnBanner.classList.remove('hidden');
+    app.stopTimerEngine();
     app.timerInterval = setInterval(() => {
       app.timerSeconds++;
       app._tickTimer();
