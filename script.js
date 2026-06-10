@@ -1304,14 +1304,17 @@ const app = {
 
 /* ── VISIBILITY / UNLOAD ─────────────────────────────── */
 document.addEventListener('visibilitychange', () => {
-  if (!app.timerOn) return;
   if (document.hidden) {
+    if (!app.timerOn) return;
     tabSwitchCount++;
     app.stopTimerEngine();
     app.saveProgress();
     if (app.instructInterval) { clearInterval(app.instructInterval); }
     if (app.readInterval)     { clearInterval(app.readInterval); }
+    app._wasTimerRunning = true;
   } else {
+    if (!app._wasTimerRunning) return;
+    app._wasTimerRunning = false;
     const warnBanner = document.getElementById('tab-warning-banner');
     if (warnBanner) warnBanner.classList.remove('hidden');
     app.stopTimerEngine();
