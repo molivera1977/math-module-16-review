@@ -42,10 +42,11 @@ function submitScorePartial() {
       total:     app.currentBank.length,
       percent:   pct,
       status:    `In Progress (Q${app.currentIndex + 1}/${app.currentBank.length})`,
-      done:      false,
-      elapsed:   app.timerSeconds,
-      tabSwitches: tabSwitchCount,
-      timestamp: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+      done:           false,
+      elapsed:        app.timerSeconds,
+      tabSwitches:    tabSwitchCount,
+      wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] ${m.q}`).join(' | '),
+      timestamp:      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
     })
   }).catch(() => {});
 }
@@ -67,10 +68,11 @@ function submitScoreFinal() {
       total:     app.currentBank.length,
       percent:   pct,
       status:    'Complete',
-      done:      true,
-      elapsed:   app.timerSeconds,
-      tabSwitches: tabSwitchCount,
-      timestamp: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+      done:           true,
+      elapsed:        app.timerSeconds,
+      tabSwitches:    tabSwitchCount,
+      wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] ${m.q}`).join(' | '),
+      timestamp:      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
     })
   }).catch(() => {});
 }
